@@ -97,8 +97,14 @@ body::after {
   transform: translateY(6px);
   pointer-events: none;
   transition: opacity 0.35s ease, transform 0.35s ease;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--bg);
 }
+.slide::-webkit-scrollbar { width: 6px; }
+.slide::-webkit-scrollbar-track { background: var(--bg); }
+.slide::-webkit-scrollbar-thumb { background: var(--border); }
 .slide.active {
   opacity: 1;
   transform: translateY(0);
@@ -662,7 +668,6 @@ code {
     display: none;
     flex-direction: column;
     padding: 4vh 4vw 8vh;
-    overflow-y: auto;
     opacity: 1;
     transform: none;
   }
