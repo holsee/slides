@@ -691,8 +691,8 @@ body::after {
   text-shadow: 0 0 4px rgba(240,160,48,0.4);
 }
 
-/* ── Blinking cursor after title slide header ── */
-.title-slide .mega-title::after {
+/* ── Typewriter cursor ── */
+#typewriter::after {
   content: '█';
   animation: blink 1s step-end infinite;
   color: var(--accent);
@@ -1210,7 +1210,7 @@ body.notes-open .progress { z-index: 200; }
 <!-- ═══════ SLIDE 1: Title ═══════ -->
 <div class="slide title-slide">
   <div class="section-label anim">Engineering Enablement</div>
-  <div class="mega-title anim">Configuring Your<br>Coding Agent</div>
+  <div class="mega-title anim"><span id="typewriter"></span></div>
   <div class="mega-subtitle anim">A comprehensive primer on setting up developer workflows, agent development lifecycles, and 2 common agentic engineering harnesses.</div>
   <div class="tag-line anim">April 2026 · Claude Code · OpenCode</div>
 </div>
@@ -1829,6 +1829,51 @@ document.addEventListener('click', e => {
   header.addEventListener('touchstart', startDrag, { passive: false });
   document.addEventListener('touchmove', onDrag, { passive: false });
   document.addEventListener('touchend', endDrag);
+})();
+
+// ── Typewriter title animation ──
+(function() {
+  const el = document.getElementById('typewriter');
+  const titles = [
+    'Configuring Your\nCoding Agent',
+    'The Anatomy\nof Agents'
+  ];
+  const TYPE_MS = 55;
+  const DELETE_MS = 35;
+  const PAUSE_MS = 2500;
+  let ti = 0;
+
+  function setText(t) { el.innerHTML = t.replace(/\n/g, '<br>'); }
+
+  function type(text, i, cb) {
+    if (i <= text.length) {
+      setText(text.slice(0, i));
+      setTimeout(() => type(text, i + 1, cb), TYPE_MS);
+    } else {
+      setTimeout(cb, PAUSE_MS);
+    }
+  }
+
+  function del(text, i, cb) {
+    if (i >= 0) {
+      setText(text.slice(0, i));
+      setTimeout(() => del(text, i - 1, cb), DELETE_MS);
+    } else {
+      setTimeout(cb, 300);
+    }
+  }
+
+  function cycle() {
+    const text = titles[ti];
+    type(text, 0, () => {
+      del(text, text.length, () => {
+        ti = (ti + 1) % titles.length;
+        cycle();
+      });
+    });
+  }
+
+  cycle();
 })();
 
 // ── Inline Lucide-compatible SVG icons (no CDN needed) ──
