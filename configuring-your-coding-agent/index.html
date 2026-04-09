@@ -1071,7 +1071,7 @@ body.notes-open .progress { z-index: 200; }
 <div class="slide">
   <div class="section-label anim">Context</div>
   <div class="slide-title anim">Why Agentic Engineering?</div>
-  <div class="slide-subtitle anim">Coding agents are not just autocomplete — they are autonomous collaborators that read your codebase, execute commands, make multi-file edits, and verify their own work. Configuring them properly is the difference between a junior pair-programmer and a senior engineer on your team.</div>
+  <div class="slide-subtitle anim">Coding agents are autonomous collaborators that read your codebase, execute commands, and verify their own work. Configuration is the difference between a junior pair-programmer and a senior engineer.</div>
   <div class="stat-grid anim">
     <div class="stat-card"><div class="stat-num">60%</div><div class="stat-label">Less time on boilerplate tasks</div></div>
     <div class="stat-card"><div class="stat-num">3–5×</div><div class="stat-label">Faster PR throughput</div></div>
@@ -1131,16 +1131,16 @@ body.notes-open .progress { z-index: 200; }
 <div class="slide">
   <div class="section-label anim">Instructions</div>
   <div class="slide-title anim">Project Instructions: The Most Important File</div>
-  <div class="slide-subtitle anim">CLAUDE.md (or AGENTS.md for OpenCode) is loaded into every session. It tells the agent what your project is, how to build it, how to test it, and what conventions to follow.</div>
+  <div class="slide-subtitle anim">CLAUDE.md (or AGENTS.md) is loaded into every session. It tells the agent how to build, test, and follow your conventions.</div>
   <div class="card-grid cols-2 anim">
-    <div class="card"><div class="card-title accent">Build &amp; Test Commands</div><div class="card-desc">npm run dev, npm test, lint scripts — so the agent never guesses</div></div>
-    <div class="card" data-accent="sky"><div class="card-title sky">Architecture Overview</div><div class="card-desc">Tech stack, directory layout, key modules, DB access patterns</div></div>
+    <div class="card"><div class="card-title accent">Build &amp; Test Commands</div><div class="card-desc">npm run dev, npm test, lint — so the agent never guesses</div></div>
+    <div class="card" data-accent="sky"><div class="card-title sky">Architecture Overview</div><div class="card-desc">Tech stack, directory layout, key modules</div></div>
     <div class="card" data-accent="violet"><div class="card-title violet">Coding Conventions</div><div class="card-desc">Naming, error handling, import style, forbidden patterns</div></div>
-    <div class="card" data-accent="amber"><div class="card-title amber">Non-Obvious Gotchas</div><div class="card-desc">"Tests use a real DB", "Never import X from Y", migration notes</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber">Non-Obvious Gotchas</div><div class="card-desc">"Tests use a real DB", "Never import X from Y"</div></div>
   </div>
   <div class="tip-box anim">
     <span class="tip-icon"><i data-lucide="lightbulb"></i></span>
-    <span>Keep it under 200 lines. Longer files consume too much context and reduce instruction adherence. Split into .claude/rules/ or skills when it grows.</span>
+    <span>Keep under 200 lines. Split into .claude/rules/ or skills when it grows.</span>
   </div>
 </div>
 
@@ -1213,23 +1213,23 @@ body.notes-open .progress { z-index: 200; }
 <div class="slide">
   <div class="section-label anim">Delegation</div>
   <div class="slide-title anim">Agents &amp; Subagents — Specialised Workers</div>
-  <div class="slide-subtitle anim">Subagents run in isolated context with their own tools, models, and permissions. They do focused work without bloating your main conversation.</div>
+  <div class="slide-subtitle anim">Subagents run in isolated context with their own tools, models, and permissions.</div>
   <div class="card-grid cols-3 anim">
-    <div class="card" data-accent="rose"><div class="card-title rose"><i data-lucide="shield-check"></i> Code Reviewer</div><div class="card-desc">Read-only. Scans diffs for bugs, style issues, and security concerns.</div></div>
-    <div class="card"><div class="card-title accent"><i data-lucide="compass"></i> Explore (Spec Oracle)</div><div class="card-desc">Answers product-contextual questions on behalf of working agents, keeping their context lean and focused.</div></div>
-    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="calendar-range"></i> Sprint Planner</div><div class="card-desc">Decomposes epics into sprint-sized tasks with estimates, dependencies, and acceptance criteria.</div></div>
-    <div class="card" data-accent="green"><div class="card-title green"><i data-lucide="pen-line"></i> Technical Writer</div><div class="card-desc">Generates and maintains docs, READMEs, ADRs, and API references from code changes.</div></div>
-    <div class="card" data-accent="violet"><div class="card-title violet"><i data-lucide="shield-alert"></i> QA Guardian (Strict)</div><div class="card-desc">Authors test plans, reviews designs for testability, writes Playwright e2e tests, hunts edge cases, and collaborates during development.</div></div>
-    <div class="card" data-accent="sky"><div class="card-title sky"><i data-lucide="telescope"></i> Researcher</div><div class="card-desc">Deep-dives into documentation, APIs, and codebases to surface answers, prior art, and options.</div></div>
+    <div class="card" data-accent="rose"><div class="card-title rose"><i data-lucide="shield-check"></i> Code Reviewer</div><div class="card-desc">Read-only. Scans diffs for bugs and security.</div></div>
+    <div class="card"><div class="card-title accent"><i data-lucide="compass"></i> Explore</div><div class="card-desc">Answers contextual questions, keeps main context lean.</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="calendar-range"></i> Sprint Planner</div><div class="card-desc">Decomposes epics into tasks with estimates.</div></div>
+    <div class="card" data-accent="green"><div class="card-title green"><i data-lucide="pen-line"></i> Technical Writer</div><div class="card-desc">Maintains docs, READMEs, and ADRs.</div></div>
+    <div class="card" data-accent="violet"><div class="card-title violet"><i data-lucide="shield-alert"></i> QA Guardian</div><div class="card-desc">Test plans, e2e tests, edge case hunting.</div></div>
+    <div class="card" data-accent="sky"><div class="card-title sky"><i data-lucide="telescope"></i> Researcher</div><div class="card-desc">Deep-dives into docs, APIs, and codebases.</div></div>
   </div>
-  <div class="callout anim" style="font-style:normal;color:var(--muted);font-size:0.72rem"><code style="color:var(--muted)">Frontmatter: name, description, model, tools, disallowedTools, permissionMode, hooks, skills, maxTurns, memory, isolation</code></div>
+  <div class="callout anim" style="font-style:normal;color:var(--muted);font-size:0.78rem"><code style="color:var(--muted)">Frontmatter: name, description, model, tools, permissionMode, hooks, skills, maxTurns, memory</code></div>
 </div>
 
 <!-- ═══════ SLIDE 10: Hooks ═══════ -->
 <div class="slide">
   <div class="section-label anim">Automation</div>
   <div class="slide-title anim">Hooks — Lifecycle Automation</div>
-  <div class="slide-subtitle anim">Hooks fire at specific lifecycle points. They provide deterministic control — ensuring actions always happen rather than relying on the LLM to choose.</div>
+  <div class="slide-subtitle anim">Hooks fire at specific lifecycle points — deterministic control that doesn't rely on the LLM to choose.</div>
   <div class="hook-flow anim">
     <div class="hook-card"><div class="hook-name">SessionStart</div><div class="hook-desc">Session begins</div></div>
     <div class="hook-card"><div class="hook-name">PreToolUse</div><div class="hook-desc">Before a tool executes</div></div>
@@ -1248,12 +1248,12 @@ body.notes-open .progress { z-index: 200; }
 <div class="slide">
   <div class="section-label anim">Productivity</div>
   <div class="slide-title anim">Custom Commands — Your Team's Shortcuts</div>
-  <div class="slide-subtitle anim">Every markdown file in the commands/ directory becomes a slash command. Standardise repetitive workflows across the team.</div>
+  <div class="slide-subtitle anim">Every markdown file in commands/ becomes a slash command. Standardise repetitive workflows.</div>
   <div class="anim" style="display:flex;flex-direction:column;gap:0.6rem">
-    <div class="card"><div class="card-title accent mono">/project:review</div><div class="card-desc">Run git diff against main, review for bugs, security, and missing tests</div></div>
-    <div class="card" data-accent="green"><div class="card-title green mono">/project:fix-issue</div><div class="card-desc">Take a GitHub issue number, reproduce, fix, and create a PR</div></div>
-    <div class="card" data-accent="amber"><div class="card-title amber mono">/project:deploy</div><div class="card-desc">Run the full staging deploy pipeline with pre-flight checks</div></div>
-    <div class="card" data-accent="violet"><div class="card-title violet mono">/project:onboard</div><div class="card-desc">Explain the codebase architecture, key patterns, and dev setup</div></div>
+    <div class="card"><div class="card-title accent mono">/project:review</div><div class="card-desc">Diff against main, review for bugs and security</div></div>
+    <div class="card" data-accent="green"><div class="card-title green mono">/project:fix-issue</div><div class="card-desc">Take a GitHub issue, reproduce, fix, create PR</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber mono">/project:deploy</div><div class="card-desc">Staging deploy pipeline with pre-flight checks</div></div>
+    <div class="card" data-accent="violet"><div class="card-title violet mono">/project:onboard</div><div class="card-desc">Explain architecture, key patterns, and dev setup</div></div>
   </div>
 </div>
 
@@ -1263,32 +1263,29 @@ body.notes-open .progress { z-index: 200; }
   <div class="slide-title anim">MCP Servers, Custom Tools &amp; Plugins</div>
   <div class="card-grid cols-3 anim">
     <div class="card" style="border-top:3px solid var(--accent)">
-      <div class="card-title accent" style="font-size:1.05rem;margin-bottom:0.8rem"><i data-lucide="plug"></i> MCP Servers</div>
-      <div class="card-desc" style="line-height:2">
-        • Connect to databases, APIs, Slack, GitHub<br>
+      <div class="card-title accent"><i data-lucide="plug"></i> MCP Servers</div>
+      <div class="card-desc" style="line-height:1.8">
+        • Databases, APIs, Slack, GitHub<br>
         • Local (stdio) or remote (HTTP/SSE)<br>
-        • Claude Code: <code>.mcp.json</code><br>
-        • OpenCode: <code>opencode.json</code> mcp key<br>
+        • <code>.mcp.json</code> / <code>opencode.json</code><br>
         • Tools auto-available to agents
       </div>
     </div>
     <div class="card" data-accent="green" style="border-top:3px solid var(--green)">
-      <div class="card-title green" style="font-size:1.05rem;margin-bottom:0.8rem"><i data-lucide="wrench"></i> Custom Tools</div>
-      <div class="card-desc" style="line-height:2">
+      <div class="card-title green"><i data-lucide="wrench"></i> Custom Tools</div>
+      <div class="card-desc" style="line-height:1.8">
         • OpenCode: <code>.opencode/tools/</code><br>
-        • TypeScript/JS tool definitions<br>
+        • TypeScript/JS with Zod schemas<br>
         • Can invoke scripts in any language<br>
-        • Type-safe with Zod schemas<br>
         • Claude Code: via MCP or plugins
       </div>
     </div>
     <div class="card" data-accent="violet" style="border-top:3px solid var(--accent3)">
-      <div class="card-title violet" style="font-size:1.05rem;margin-bottom:0.8rem"><i data-lucide="puzzle"></i> Plugins</div>
-      <div class="card-desc" style="line-height:2">
+      <div class="card-title violet"><i data-lucide="puzzle"></i> Plugins</div>
+      <div class="card-desc" style="line-height:1.8">
         • Bundle skills + hooks + agents + MCP<br>
         • Share across projects &amp; teams<br>
-        • Claude Code: marketplaces + git repos<br>
-        • OpenCode: npm packages + local JS/TS<br>
+        • Marketplaces, git repos, or npm<br>
         • Namespaced to avoid conflicts
       </div>
     </div>
@@ -1299,7 +1296,7 @@ body.notes-open .progress { z-index: 200; }
 <div class="slide">
   <div class="section-label anim">Behaviour</div>
   <div class="slide-title anim">Modes &amp; Output Styles</div>
-  <div class="slide-subtitle anim">Modes restrict tools and set system prompts. Output styles change formatting and tone without changing capabilities.</div>
+  <div class="slide-subtitle anim">Modes restrict tools and set system prompts. Output styles change tone without changing capabilities.</div>
   <div class="card-grid cols-2 anim">
     <div style="display:flex;flex-direction:column;gap:0.6rem">
       <div class="card" data-accent="green"><div class="card-title green">Build</div><div class="card-desc">All tools enabled. Default for development work.</div></div>
@@ -1307,14 +1304,11 @@ body.notes-open .progress { z-index: 200; }
       <div class="card" data-accent="amber"><div class="card-title amber">Review</div><div class="card-desc">Code review focus. Read + documentation tools only. (OpenCode)</div></div>
       <div class="card" data-accent="rose"><div class="card-title rose">Debug</div><div class="card-desc">Investigation mode. Bash + read tools, no writes. (OpenCode)</div></div>
     </div>
-    <div class="card" data-accent="violet" style="border-top:3px solid var(--accent3)">
-      <div class="card-title violet" style="font-size:1.05rem;margin-bottom:0.6rem">Output Styles <span style="font-size:0.75rem;color:var(--muted)">(Claude Code)</span></div>
-      <div class="card-desc" style="line-height:2.2">
-        • <strong>Default</strong> — standard coding assistant<br>
-        • <strong>Explanatory</strong> — adds educational insights<br>
-        • <strong>Learning</strong> — collaborative, includes TODO(human)<br>
-        • <strong>Custom</strong> — your own markdown definitions
-      </div>
+    <div style="display:flex;flex-direction:column;gap:0.6rem">
+      <div class="card" data-accent="violet"><div class="card-title violet">Default</div><div class="card-desc">Standard coding assistant output</div></div>
+      <div class="card" data-accent="sky"><div class="card-title sky">Explanatory</div><div class="card-desc">Adds educational insights</div></div>
+      <div class="card" data-accent="rose"><div class="card-title rose">Learning</div><div class="card-desc">Collaborative, includes TODO(human)</div></div>
+      <div class="card" data-accent="amber"><div class="card-title amber">Custom</div><div class="card-desc">Your own markdown definitions</div></div>
     </div>
   </div>
 </div>
@@ -1323,15 +1317,13 @@ body.notes-open .progress { z-index: 200; }
 <div class="slide">
   <div class="section-label anim">Persistence</div>
   <div class="slide-title anim">Memory — Persistent Learning Across Sessions</div>
-  <div class="slide-subtitle anim">Sessions are independent — each starts with a fresh context window. Memory bridges the gap, allowing the agent to accumulate project knowledge over time.</div>
-  <div class="anim" style="display:flex;flex-direction:column;gap:0.8rem">
-    <div class="card"><div class="card-title accent">Auto-Memory</div><div class="card-desc">Claude Code saves observations automatically — commands it discovers, patterns it notices, architecture insights. Stored in ~/.claude/projects/&lt;hash&gt;/memory/ with a MEMORY.md index.</div></div>
-    <div class="card-grid cols-2" style="gap:0.8rem">
-      <div class="card" data-accent="green"><div class="card-title green">Agent Memory (shared)</div><div class="card-desc">Subagents persist knowledge in .claude/agent-memory/&lt;name&gt;/. Committed to git so the whole team benefits.</div></div>
-      <div class="card" data-accent="violet"><div class="card-title violet">Agent Memory (local)</div><div class="card-desc">Personal subagent memory in .claude/agent-memory-local/. Gitignored for your own notes.</div></div>
-    </div>
+  <div class="slide-subtitle anim">Each session starts fresh. Memory bridges the gap — accumulating project knowledge over time.</div>
+  <div class="card-grid cols-3 anim">
+    <div class="card"><div class="card-title accent">Auto-Memory</div><div class="card-desc">Saves observations automatically — commands, patterns, architecture. Stored in ~/.claude/projects/ with MEMORY.md index.</div></div>
+    <div class="card" data-accent="green"><div class="card-title green">Shared Agent Memory</div><div class="card-desc">Subagents persist in .claude/agent-memory/. Committed to git — whole team benefits.</div></div>
+    <div class="card" data-accent="violet"><div class="card-title violet">Local Agent Memory</div><div class="card-desc">Personal memory in .claude/agent-memory-local/. Gitignored for your own notes.</div></div>
   </div>
-  <div class="callout anim">Memory files use YAML frontmatter with types: user, feedback, project, reference. The first 200 lines / 25 KB load each session.</div>
+  <div class="callout anim">Memory types: user, feedback, project, reference. First 200 lines / 25 KB load each session.</div>
 </div>
 
 <!-- ═══════ SLIDE 15: Lifecycle ═══════ -->
@@ -1379,12 +1371,12 @@ body.notes-open .progress { z-index: 200; }
   <div class="section-label anim">Guidance</div>
   <div class="slide-title anim">Best Practices for Your Team</div>
   <div class="card-grid cols-2 anim">
-    <div class="card" data-accent="green"><div class="card-title green"><i data-lucide="circle-check"></i> Commit your config to git</div><div class="card-desc">CLAUDE.md, settings.json, skills/, agents/ — everyone on the team benefits. Use .local files for personal preferences.</div></div>
-    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="rocket"></i> Start with skills you use daily</div><div class="card-desc">PR review, test writing, deployment — automate the workflows your team repeats most.</div></div>
-    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="lightbulb"></i> Keep instructions specific and concise</div><div class="card-desc">Write what the agent can't figure out from reading code. Target under 200 lines; split into rules or skills.</div></div>
-    <div class="card" data-accent="violet"><div class="card-title violet"><i data-lucide="brain"></i> Iterate based on corrections</div><div class="card-desc">When you correct the agent, add that guidance to your config. Auto-memory captures patterns; formalise the important ones.</div></div>
-    <div class="card" data-accent="rose"><div class="card-title rose"><i data-lucide="shield-check"></i> Use deny rules for safety</div><div class="card-desc">Block access to .env, secrets/, and sensitive paths. Deny rules always win, even in bypass mode.</div></div>
-    <div class="card" data-accent="sky"><div class="card-title sky"><i data-lucide="settings"></i> Scope permissions tightly</div><div class="card-desc">Allow only the tools and commands the agent actually needs. Expand as trust builds. Audit with /permissions.</div></div>
+    <div class="card" data-accent="green"><div class="card-title green"><i data-lucide="circle-check"></i> Commit config to git</div><div class="card-desc">CLAUDE.md, settings, skills, agents — use .local files for personal prefs.</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="rocket"></i> Start with daily workflows</div><div class="card-desc">PR review, test writing, deployment — automate what you repeat most.</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="lightbulb"></i> Keep instructions concise</div><div class="card-desc">Under 200 lines. Write what the agent can't infer from code.</div></div>
+    <div class="card" data-accent="violet"><div class="card-title violet"><i data-lucide="brain"></i> Iterate from corrections</div><div class="card-desc">Every correction is a config improvement. Formalise auto-memory patterns.</div></div>
+    <div class="card" data-accent="rose"><div class="card-title rose"><i data-lucide="shield-check"></i> Deny rules for safety</div><div class="card-desc">Block .env, secrets/, sensitive paths. Deny always wins.</div></div>
+    <div class="card" data-accent="sky"><div class="card-title sky"><i data-lucide="settings"></i> Scope permissions tightly</div><div class="card-desc">Allow only what's needed. Expand as trust builds.</div></div>
   </div>
 </div>
 
