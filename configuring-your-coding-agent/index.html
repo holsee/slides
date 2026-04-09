@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuring Your Coding Agent</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #020810;
+  --bg-alt: #0a1628;
+  --bg-card: #0c1a2e;
+  --accent: #4fc3f7;
+  --accent2: #29b6f6;
+  --accent3: #81d4fa;
+  --green: #4dd0e1;
+  --amber: #80deea;
+  --rose: #e0f7fa;
+  --text: #b3e5fc;
+  --muted: #4a6a7a;
+  --dim: #1a3050;
+  --glow: #4fc3f7;
+  --glow-strong: 0 0 8px #4fc3f780, 0 0 20px #4fc3f730;
+  --glow-text: 0 0 6px #4fc3f750;
+  --border: #1e3a5f;
+  --font-h: 'Noto Sans Mono', monospace;
+  --font-b: 'Noto Sans Mono', monospace;
+  --font-mono: 'Noto Sans Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-b);
+  font-size: 14px;
+  text-shadow: var(--glow-text);
+}
+
+/* ── CRT scanlines overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 20, 40, 0.15) 2px,
+    rgba(0, 20, 40, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── CRT vignette ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ── Subtle ambient flicker ── */
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.97; }
+  94% { opacity: 1; }
+}
+
+/* ── Slide deck ── */
+.deck {
+  width: 100vw; height: 100vh;
+  position: relative;
+  animation: crt-flicker 8s infinite;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5vh 6vw;
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  overflow: hidden;
+}
+.slide.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.slide.exit-left {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* ── Progress bar ── */
+.progress {
+  position: fixed; top: 0; left: 0;
+  height: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent), 0 0 30px rgba(79,195,247,0.3);
+  transition: width 0.4s ease;
+  z-index: 100;
+}
+
+/* ── Author handle ── */
+.author-handle {
+  position: fixed;
+  top: 2vh; right: 3vw;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  z-index: 100;
+  text-decoration: none;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+.author-handle:hover {
+  color: var(--accent);
+  text-shadow: var(--glow-text);
+}
+
+/* ── Slide counter ── */
+.counter {
+  position: fixed;
+  bottom: 2vh; right: 3vw;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  z-index: 100;
+}
+.counter::before { content: '[ '; color: var(--dim); }
+.counter::after { content: ' ]'; color: var(--dim); }
+
+/* ── Navigation arrows ── */
+.nav-arrows {
+  position: fixed;
+  bottom: 2vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.3rem;
+  z-index: 100;
+}
+.nav-arrows button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--accent);
+  width: 36px; height: 36px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  text-shadow: var(--glow-text);
+}
+.nav-arrows button:hover {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+  box-shadow: var(--glow-strong);
+  text-shadow: none;
+}
+
+/* ── Typography ── */
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.5rem;
+}
+.section-label::before { content: '// '; color: var(--dim); }
+.slide-title {
+  font-family: var(--font-h);
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(79,195,247,0.4), 0 0 30px rgba(79,195,247,0.15);
+}
+.slide-subtitle {
+  font-size: clamp(0.78rem, 1.1vw, 0.9rem);
+  color: var(--text);
+  line-height: 1.7;
+  max-width: 60em;
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+.mono { font-family: var(--font-mono); }
+
+/* ── Cards ── */
+.card-grid {
+  display: grid;
+  gap: 0.6rem;
+}
+.card-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.card-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.card-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.card-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 1rem 1.2rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(79,195,247,0.1);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 3px; height: 100%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+.card[data-accent="green"]::before { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.card[data-accent="amber"]::before { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.card[data-accent="rose"]::before { background: var(--rose); box-shadow: 0 0 6px var(--rose); }
+.card[data-accent="violet"]::before { background: var(--accent3); box-shadow: 0 0 6px var(--accent3); }
+.card[data-accent="sky"]::before { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+.card[data-accent="none"]::before { display: none; }
+
+.card-title {
+  font-family: var(--font-h);
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+.card-title.accent { color: var(--accent); }
+.card-title.green { color: var(--green); }
+.card-title.amber { color: var(--amber); }
+.card-title.rose { color: var(--rose); }
+.card-title.violet { color: var(--accent3); }
+.card-title.sky { color: var(--accent2); }
+
+.card-desc {
+  font-size: 0.75rem;
+  color: var(--text);
+  line-height: 1.55;
+  opacity: 0.7;
+}
+
+/* ── Stat callouts ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1.2rem;
+  text-align: center;
+  border-top: 2px solid var(--accent);
+}
+.stat-card:nth-child(2) { border-top-color: var(--green); }
+.stat-card:nth-child(3) { border-top-color: var(--accent3); }
+.stat-num {
+  font-family: var(--font-h);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 0 12px rgba(79,195,247,0.5);
+}
+.stat-card:nth-child(2) .stat-num { color: var(--green); text-shadow: 0 0 12px rgba(77,208,225,0.5); }
+.stat-card:nth-child(3) .stat-num { color: var(--accent3); text-shadow: 0 0 12px rgba(129,212,250,0.5); }
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text);
+  opacity: 0.6;
+  margin-top: 0.3rem;
+}
+
+/* ── Code tree ── */
+.code-tree {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1rem 1.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.8;
+  color: var(--text);
+}
+.code-tree .tree-header {
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+  text-shadow: 0 0 8px rgba(79,195,247,0.4);
+}
+.code-tree .tree-header::before { content: '> '; color: var(--muted); }
+.code-tree .tree-line { color: var(--muted); }
+.code-tree .tree-line span { color: var(--text); opacity: 0.85; }
+
+/* ── Table ── */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+}
+.comparison-table th {
+  background: var(--dim);
+  padding: 0.5rem 0.8rem;
+  text-align: left;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  color: var(--accent);
+}
+.comparison-table th:nth-child(2) { color: var(--accent); text-align: center; }
+.comparison-table th:nth-child(3) { color: var(--green); text-align: center; }
+.comparison-table td {
+  padding: 0.4rem 0.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  opacity: 0.8;
+}
+.comparison-table td:nth-child(2),
+.comparison-table td:nth-child(3) { text-align: center; }
+.comparison-table tr:hover td { background: var(--dim); opacity: 1; }
+
+/* ── Flow / lifecycle ── */
+.flow-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+}
+.flow-step {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1rem 0.8rem;
+  text-align: center;
+  border-top: 2px solid var(--accent);
+}
+.flow-step:nth-child(2) { border-top-color: var(--accent2); }
+.flow-step:nth-child(3) { border-top-color: var(--green); }
+.flow-step:nth-child(4) { border-top-color: var(--amber); }
+.flow-step:nth-child(5) { border-top-color: var(--accent3); }
+.flow-num {
+  font-family: var(--font-h);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(79,195,247,0.4);
+}
+.flow-step:nth-child(2) .flow-num { color: var(--accent2); }
+.flow-step:nth-child(3) .flow-num { color: var(--green); }
+.flow-step:nth-child(4) .flow-num { color: var(--amber); }
+.flow-step:nth-child(5) .flow-num { color: var(--accent3); }
+.flow-title {
+  font-family: var(--font-h);
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin: 0.3rem 0 0.4rem;
+  color: var(--text);
+}
+.flow-desc { font-size: 0.72rem; color: var(--text); opacity: 0.6; line-height: 1.5; }
+
+/* ── Hook timeline ── */
+.hook-flow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+.hook-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 0.8rem;
+  border-top: 2px solid var(--accent);
+}
+.hook-card:nth-child(2) { border-top-color: var(--amber); }
+.hook-card:nth-child(3) { border-top-color: var(--green); }
+.hook-card:nth-child(4) { border-top-color: var(--accent3); }
+.hook-name {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 0 6px rgba(79,195,247,0.3);
+}
+.hook-card:nth-child(2) .hook-name { color: var(--amber); }
+.hook-card:nth-child(3) .hook-name { color: var(--green); }
+.hook-card:nth-child(4) .hook-name { color: var(--accent3); }
+.hook-desc { font-size: 0.72rem; color: var(--text); opacity: 0.6; margin-top: 0.3rem; }
+
+/* ── Tip box ── */
+.tip-box {
+  background: var(--bg-alt);
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 8px rgba(79,195,247,0.15);
+  padding: 0.7rem 1rem;
+  font-size: 0.78rem;
+  color: var(--text);
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+.tip-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+.callout {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-style: normal;
+  margin-top: 0.8rem;
+  opacity: 0.8;
+}
+.callout::before { content: '> '; color: var(--muted); }
+
+/* ── Title slide special ── */
+.title-slide {
+  justify-content: center;
+  position: relative;
+}
+.title-slide::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0;
+  width: 35%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(79,195,247,0.03) 0%, rgba(79,195,247,0.08) 100%);
+  border-left: 1px solid var(--border);
+}
+.title-slide .mega-title {
+  font-family: var(--font-h);
+  font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  text-shadow: 0 0 15px rgba(79,195,247,0.5), 0 0 40px rgba(79,195,247,0.2);
+}
+.title-slide .mega-subtitle {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.7;
+  max-width: 38em;
+  margin-bottom: 2rem;
+  opacity: 0.65;
+}
+.title-slide .tag-line {
+  font-size: 0.75rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  padding-top: 0.8rem;
+  display: inline-block;
+}
+.title-slide .tag-line::before { content: '$ '; color: var(--accent); }
+
+/* ── Numbered steps ── */
+.step-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 0.7rem 1rem;
+}
+.step-num {
+  background: var(--accent);
+  color: var(--bg);
+  width: 1.8rem; height: 1.8rem;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(79,195,247,0.3);
+}
+.step-content-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.1rem;
+  color: var(--accent);
+}
+.step-content-desc {
+  font-size: 0.75rem;
+  color: var(--text);
+  line-height: 1.4;
+  opacity: 0.65;
+}
+
+/* ── Permission row ── */
+.perm-row {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 0.7rem 1rem;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid var(--green);
+  gap: 1.2rem;
+}
+.perm-row.ask { border-left-color: var(--amber); }
+.perm-row.deny { border-left-color: var(--rose); }
+.perm-label {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  width: 4.5rem;
+  flex-shrink: 0;
+  color: var(--green);
+  text-shadow: 0 0 6px rgba(77,208,225,0.4);
+}
+.perm-row.ask .perm-label { color: var(--amber); text-shadow: 0 0 6px rgba(128,222,234,0.4); }
+.perm-row.deny .perm-label { color: var(--rose); text-shadow: 0 0 6px rgba(224,247,250,0.3); }
+.perm-desc { font-size: 0.78rem; color: var(--text); flex: 1; opacity: 0.8; }
+.perm-ex { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+
+/* ── Closing slide ── */
+.closing-slide {
+  position: relative;
+}
+.closing-slide::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(79,195,247,0.03), rgba(79,195,247,0.08));
+  border-left: 1px solid var(--border);
+}
+.resource-list {
+  list-style: none;
+  margin-top: 0.8rem;
+}
+.resource-list li {
+  font-size: 0.8rem;
+  color: var(--text);
+  opacity: 0.7;
+  padding: 0.35rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+.resource-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+/* ── Animations for slide children ── */
+.slide.active .anim {
+  animation: fadeUp 0.4s ease both;
+}
+.slide.active .anim:nth-child(1) { animation-delay: 0.05s; }
+.slide.active .anim:nth-child(2) { animation-delay: 0.12s; }
+.slide.active .anim:nth-child(3) { animation-delay: 0.2s; }
+.slide.active .anim:nth-child(4) { animation-delay: 0.28s; }
+.slide.active .anim:nth-child(5) { animation-delay: 0.36s; }
+.slide.active .anim:nth-child(6) { animation-delay: 0.44s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Keyboard hint ── */
+.kb-hint {
+  position: fixed;
+  bottom: 2vh; left: 3vw;
+  font-size: 0.65rem;
+  color: var(--dim);
+  z-index: 100;
+}
+.kb-hint kbd {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0.1rem 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--muted);
+}
+.kb-hint kbd.kb-orange {
+  border-color: #7c4a00;
+  color: #f0a030;
+  text-shadow: 0 0 4px rgba(240,160,48,0.4);
+}
+
+/* ── Blinking cursor after title slide header ── */
+.title-slide .mega-title::after {
+  content: '█';
+  animation: blink 1s step-end infinite;
+  color: var(--accent);
+  font-size: 0.7em;
+  margin-left: 0.1em;
+  text-shadow: 0 0 10px var(--accent);
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ── Code / inline code styling ── */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  color: var(--accent);
+}
+
+/* ── Lucide icons ── */
+[data-lucide], .lucide {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.12em;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+.tip-icon [data-lucide], .tip-icon .lucide {
+  width: 1.2em;
+  height: 1.2em;
+  stroke: var(--accent);
+  filter: drop-shadow(0 0 5px var(--accent));
+}
+.card-title [data-lucide], .card-title .lucide {
+  width: 1.05em;
+  height: 1.05em;
+}
+
+@media (max-width: 900px) {
+  .slide { padding: 4vh 4vw; }
+  .card-grid.cols-2, .card-grid.cols-3, .card-grid.cols-4, .card-grid.cols-5 {
+    grid-template-columns: 1fr;
+  }
+  .stat-grid, .hook-flow, .flow-grid { grid-template-columns: 1fr 1fr; }
+  .comparison-table { font-size: 0.65rem; }
+}
+/* ═══════════════════════════════════════════
+   SPEAKER NOTES PANEL — Orange Terminal Theme
+   Optimised for speakers & deaf audience members
+   ═══════════════════════════════════════════ */
+
+/* ── Notes panel ── */
+.notes-panel {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 0;
+  overflow: hidden;
+  background: #0c0a04;
+  border-top: 2px solid #f0a030;
+  box-shadow: 0 -4px 30px rgba(240,160,48,0.1);
+  z-index: 150;
+  transition: height 0.35s cubic-bezier(.4,0,.2,1);
+  font-family: var(--font-mono);
+  display: flex;
+  flex-direction: column;
+}
+.notes-panel.open {
+  height: 42vh;
+}
+
+/* ── Scanlines for notes panel ── */
+.notes-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(20, 12, 0, 0.12) 2px,
+    rgba(20, 12, 0, 0.12) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Notes header bar ── */
+.notes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1.5rem;
+  border-bottom: 1px solid #2a1a00;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+.notes-header-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #f0a030;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 6px rgba(240,160,48,0.4);
+}
+.notes-header-slide {
+  font-size: 0.65rem;
+  color: #8a6020;
+}
+
+/* ── Notes content area ── */
+.notes-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.2rem 2rem 1.5rem;
+  position: relative;
+  z-index: 2;
+  scrollbar-width: thin;
+  scrollbar-color: #3a2200 #0c0a04;
+}
+.notes-content::-webkit-scrollbar { width: 6px; }
+.notes-content::-webkit-scrollbar-track { background: #0c0a04; }
+.notes-content::-webkit-scrollbar-thumb { background: #3a2200; }
+
+/* ── Note sections ── */
+.note-section {
+  display: none;
+}
+.note-section.active {
+  display: block;
+}
+
+/* ── Note typography — large, clear, high-contrast ── */
+.note-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f0a030;
+  margin-bottom: 0.8rem;
+  text-shadow: 0 0 8px rgba(240,160,48,0.3);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #2a1a00;
+}
+.note-heading::before {
+  content: '▸ ';
+  color: #8a6020;
+}
+
+.note-point {
+  font-size: 0.88rem;
+  color: #e8c878;
+  line-height: 1.8;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+.note-point::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: #6a4a10;
+}
+
+.note-emphasis {
+  color: #f0a030;
+  font-weight: 600;
+  text-shadow: 0 0 4px rgba(240,160,48,0.3);
+}
+
+.note-data {
+  font-size: 0.82rem;
+  color: #c0a060;
+  background: #1a1200;
+  border: 1px solid #2a1a00;
+  padding: 0.5rem 0.8rem;
+  margin: 0.5rem 0 0.8rem 1.5rem;
+  line-height: 1.7;
+}
+
+.note-cue {
+  font-size: 0.75rem;
+  color: #8a6020;
+  font-style: italic;
+  margin-top: 0.8rem;
+  padding-top: 0.5rem;
+  border-top: 1px dotted #2a1a00;
+}
+.note-cue::before {
+  content: '// ';
+  font-style: normal;
+}
+
+/* ── Accessibility: ensure notes readable at distance ── */
+@media (min-width: 1200px) {
+  .note-point { font-size: 0.95rem; }
+  .note-heading { font-size: 1.1rem; }
+}
+
+/* ── Shift main deck up when notes open ── */
+.deck.notes-pushed {
+  height: 58vh !important;
+}
+.deck.notes-pushed .slide {
+  padding-bottom: 2vh;
+}
+
+/* ── Adjust fixed UI elements when notes are open ── */
+body.notes-open .counter,
+body.notes-open .nav-arrows,
+body.notes-open .kb-hint {
+  bottom: calc(42vh + 1vh);
+}
+body.notes-open .progress { z-index: 200; }
+</style>
+</head>
+<body>
+
+<a class="author-handle" href="https://x.com/holsee" target="_blank" rel="noopener">@holsee</a>
+<div class="progress" id="progress"></div>
+<div class="counter" id="counter"></div>
+<div class="nav-arrows">
+  <button onclick="prev()" aria-label="Previous">←</button>
+  <button onclick="next()" aria-label="Next">→</button>
+</div>
+<div class="kb-hint"><kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> · <kbd class="kb-orange">N</kbd> notes</div>
+
+<div class="notes-panel" id="notesPanel" role="complementary" aria-label="Speaker notes">
+  <div class="notes-header">
+    <span class="notes-header-title">// Speaker Notes</span>
+    <span class="notes-header-slide" id="notesSlideLabel">Slide 1 of 19</span>
+  </div>
+  <div class="notes-content">
+
+    <!-- Slide 1: Title -->
+    <div class="note-section" data-slide="0">
+      <div class="note-heading">Opening</div>
+      <div class="note-point">Welcome everyone. Today we're going to talk about something that separates teams who dabble with coding agents from teams who actually ship with them — and that's configuration.</div>
+      <div class="note-point">Most of us installed Claude Code or OpenCode, typed a prompt, and got something useful back. That's great. But if that's where you stopped, you're leaving an enormous amount of value on the table.</div>
+      <div class="note-point">Over the next twenty minutes or so, I'm going to walk you through every configuration surface these tools offer — from the basics that take five minutes, all the way to subagent architectures and lifecycle hooks. By the end, you'll have a concrete plan to take back to your repo this week.</div>
+    </div>
+
+    <!-- Slide 2: Why Agentic Engineering -->
+    <div class="note-section" data-slide="1">
+      <div class="note-heading">Why This Matters</div>
+      <div class="note-point">Let me frame the problem. A coding agent is not autocomplete. It reads your entire codebase. It runs shell commands. It makes coordinated edits across multiple files. It runs your tests to verify its own work. It can commit changes. This is a fundamentally different tool than what we had two years ago.</div>
+      <div class="note-point">Look at these numbers. Teams with well-configured agents report around sixty percent less time on boilerplate, three to five times faster PR throughput, and significantly fewer context switches because the agent handles the mechanical work while you focus on design decisions.</div>
+      <div class="note-point">But here's the catch — these numbers come from <span class="note-emphasis">configured</span> setups. Without configuration, your agent doesn't know how to build your project. It doesn't know your test runner. It doesn't know that you use a real database in tests, or that you never import from that internal package directly. It guesses. And it guesses wrong. A lot.</div>
+      <div class="note-point">Configuration is the multiplier. It's the difference between a talented contractor on day one and a senior team member who has read every doc, every PR, and every Slack thread you've ever written.</div>
+    </div>
+
+    <!-- Slide 3: Agenda -->
+    <div class="note-section" data-slide="2">
+      <div class="note-heading">What We'll Cover</div>
+      <div class="note-point">Here's our roadmap. We'll start with the foundations — where configuration files actually live, and what goes in your main instructions file. That alone will get you eighty percent of the benefit.</div>
+      <div class="note-point">Then we'll layer on permissions, rules, skills, and subagents. These are the power-user features that let you build real workflows — things like automated PR review, test generation, and sprint planning.</div>
+      <div class="note-point">If you're new to this, focus on the first three or four sections. That's your starting kit. The rest is there when you're ready to go deeper. And everyone should stay for the action plan at the end — that's five concrete steps you can take this week.</div>
+    </div>
+
+    <!-- Slide 4: Directory Structure -->
+    <div class="note-section" data-slide="3">
+      <div class="note-heading">Where Configuration Lives</div>
+      <div class="note-point">Both tools use a dot-directory in your project root. Claude Code uses dot-claude. OpenCode uses dot-opencode. Inside, you'll find slots for settings, skills, agents, commands, and more. The structures are remarkably similar.</div>
+      <div class="note-point">The important thing to know is that these are just files in your repo. You commit them to git. Your whole team gets the same configuration. When someone on your team figures out the right way to handle something, everyone benefits on their next pull.</div>
+      <div class="note-point">One detail worth calling out — both tools share the Agent Skills open standard. That means a skill you write for Claude Code will also work in OpenCode, and vice versa. OpenCode even reads Claude Code's CLAUDE.md as a fallback if you don't have an AGENTS.md. So you're not locked into one tool.</div>
+      <div class="note-point">OpenCode has a couple of extras you won't find in Claude Code — a dedicated tools directory for custom TypeScript definitions, a modes directory, and a themes directory. Claude Code has built-in path-scoped rules and auto-memory, which OpenCode handles through plugins.</div>
+    </div>
+
+    <!-- Slide 5: Project Instructions -->
+    <div class="note-section" data-slide="4">
+      <div class="note-heading">Your Most Important File</div>
+      <div class="note-point">If you take one thing away from this talk, it's this file. CLAUDE.md — or AGENTS.md if you're using OpenCode — is loaded into every single agent session. It's the first thing the agent reads. It shapes every decision it makes.</div>
+      <div class="note-point">Four things go in here. First, your build and test commands. This is the highest-impact single thing you can add. When the agent knows that your test runner is npm run test, not pytest, not cargo test, not make check — it stops guessing wrong. That alone eliminates most of the frustration new users report.</div>
+      <div class="note-point">Second, a brief architecture overview. Your tech stack, your directory layout, how you access the database. Third, your coding conventions — naming, error handling, import patterns. And fourth, the gotchas. The things that surprise even experienced developers. "Tests use a real local database, run the reset script first." "Never import from the internal package directly."</div>
+      <div class="note-point">Keep this file under two hundred lines. I know that sounds tight, but longer files actually reduce instruction adherence — the agent starts ignoring parts of it. If your instructions are growing, split them into rules or skills, which we'll cover next.</div>
+      <div class="note-point">Both tools have an init command that auto-generates a starting file by scanning your repo. Run it. It gives you a solid first draft. Then review it, tighten it, and commit it.</div>
+    </div>
+
+    <!-- Slide 6: Settings & Permissions -->
+    <div class="note-section" data-slide="5">
+      <div class="note-heading">Controlling What the Agent Can Do</div>
+      <div class="note-point">Once you've told the agent about your project, the next question is what it's allowed to do. The permission model has three levels. Allow means the agent can use that tool without asking you. Ask means it needs your approval every time. Deny means it's blocked entirely — the agent can't use it at all.</div>
+      <div class="note-point">The critical rule to remember is that deny always wins. If something is denied at any level — managed settings, project settings, or user settings — it's blocked everywhere. No one can override it. This is how security teams enforce policy.</div>
+      <div class="note-point">My recommended starting point: deny access to your .env files and any secrets directories. Allow your test commands and basic git operations without prompting. Leave everything else on ask until you've built enough trust. You can always loosen permissions later. It's much harder to tighten them after an incident.</div>
+      <div class="note-point">The settings cascade matters for larger teams. Managed settings, which your platform team or admins control, override everything. Then project settings. Then personal user settings. This means you can enforce organisation-wide rules while still letting individual teams and developers customise their experience.</div>
+    </div>
+
+    <!-- Slide 7: Rules -->
+    <div class="note-section" data-slide="6">
+      <div class="note-heading">Splitting Instructions Into Modules</div>
+      <div class="note-point">As your team grows and your instructions get longer, you'll want to split them into separate files. That's what the rules directory is for. Each markdown file in dot-claude-slash-rules covers one topic — code style, testing, API conventions, database queries.</div>
+      <div class="note-point">The powerful feature here is path scoping. You can attach glob patterns to a rule so it only loads when the agent is working on matching files. Your React component rules only load when the agent touches files in your frontend directory. Your database query rules only load for backend files. This saves context tokens and reduces noise — the agent isn't distracted by irrelevant instructions.</div>
+      <div class="note-point">There's an important distinction between rules and skills. Rules load automatically — either every session or conditionally by file path. Skills load on demand, when you invoke them or when the agent decides they're relevant. Use rules for "always know this" and skills for "know this when I ask."</div>
+      <div class="note-point">In OpenCode, this feature isn't built in natively — there's a community plugin called opencode-rules that adds it. Alternatively, you can point at any markdown files using the instructions array in your opencode.json config.</div>
+    </div>
+
+    <!-- Slide 8: Skills -->
+    <div class="note-section" data-slide="7">
+      <div class="note-heading">Reusable Workflows</div>
+      <div class="note-point">Skills are the most flexible extension point in both tools. A skill is a directory with a SKILL.md file that contains YAML frontmatter — a name, a description — and then markdown instructions. The name becomes a slash command. So a skill named deploy becomes slash-deploy.</div>
+      <div class="note-point">There are four ways a skill gets invoked. You can call it directly as a slash command. The agent can auto-load it when it reads the description and decides it matches your prompt. You can pre-load it into a subagent's context at startup. Or the agent can programmatically call the Skill tool mid-conversation.</div>
+      <div class="note-point">The allowed-tools field in the frontmatter is particularly powerful. When you declare that a skill is allowed to use certain tools, those tools are granted without per-use approval for the duration of that skill. So your deploy skill can run git commands and bash scripts without prompting you every time.</div>
+      <div class="note-point">And here's the strategic point — skills follow an open standard. They're portable across Claude Code, OpenCode, and even OpenAI's Codex. Your investment in writing skills is not locked to any one vendor. That's a meaningful advantage for teams evaluating their options.</div>
+    </div>
+
+    <!-- Slide 9: Agents & Subagents -->
+    <div class="note-section" data-slide="8">
+      <div class="note-heading">Your Agent Team</div>
+      <div class="note-point">Subagents are where things get really interesting. Each one runs in its own isolated context window with its own tools, its own model, and its own permissions. When it finishes, it sends a summary back to your main conversation. Your main context stays clean.</div>
+      <div class="note-point">Let me walk through the six examples we've defined here. The <span class="note-emphasis">Code Reviewer</span> is read-only — no write tools at all. It scans diffs for bugs, style issues, and security concerns. Simple, focused, and safe.</div>
+      <div class="note-point">The <span class="note-emphasis">Explore agent, which we call the Spec Oracle</span>, is a pattern I want to highlight specifically. When your build agent is deep in implementation and hits a product question — "what should this endpoint return for this edge case?" — instead of loading product specs into the build agent's context, you delegate that question to the Spec Oracle. It has the product context. The build agent stays focused on code. This keeps context budgets sustainable across long sessions. It's one of the most effective patterns we've found.</div>
+      <div class="note-point">The <span class="note-emphasis">Sprint Planner</span> works in analysis mode. It reads your codebase and project context to decompose epics into tasks with estimates, dependencies, and acceptance criteria. It doesn't modify anything.</div>
+      <div class="note-point">The <span class="note-emphasis">Technical Writer</span> generates and maintains your documentation — READMEs, architecture decision records, API references — from actual code changes. Pre-load it with your docs conventions skill and it produces consistent output every time.</div>
+      <div class="note-point">The <span class="note-emphasis">QA Guardian</span> is not a passive test generator. This is an active collaborator. It authors test plans before you start implementing. It reviews designs for testability. It writes Playwright end-to-end tests. And it focuses hard on edge cases — the things human reviewers tend to miss when they're tired at four PM on a Friday. Configure it with strict permissions and your team's quality standards skill.</div>
+      <div class="note-point">And the <span class="note-emphasis">Researcher</span> deep-dives into documentation, external APIs, and codebases to surface prior art and options. Read-only, web-search enabled, cannot touch your code.</div>
+    </div>
+
+    <!-- Slide 10: Hooks -->
+    <div class="note-section" data-slide="9">
+      <div class="note-heading">Deterministic Automation</div>
+      <div class="note-point">Everything we've talked about so far — instructions, skills, agents — relies on the LLM choosing to follow them. And most of the time it does. But for things that absolutely must happen, every single time, you want hooks.</div>
+      <div class="note-point">Hooks fire at specific lifecycle points. Session start. Before a tool executes. After a tool completes. When the agent finishes its turn. They're deterministic — they always fire. The agent doesn't choose whether to run them.</div>
+      <div class="note-point">The classic example is a PostToolUse hook that matches Write or Edit and runs your formatter. Every file the agent touches gets auto-formatted. Guaranteed. No relying on the agent to remember your Prettier config.</div>
+      <div class="note-point">The more powerful use case is PreToolUse hooks for security. A PreToolUse hook can inspect a bash command before it runs and block it. And here's the critical part — a deny decision from a PreToolUse hook cannot be overridden, even in bypass-permissions mode. This is how you enforce hard policy.</div>
+      <div class="note-point">Claude Code gives you four handler types: shell commands, HTTP endpoints, LLM prompt evaluation, and full agent-based hooks. OpenCode uses a JavaScript plugin system that subscribes to the same lifecycle events. Different implementation, same concept.</div>
+    </div>
+
+    <!-- Slide 11: Commands -->
+    <div class="note-section" data-slide="10">
+      <div class="note-heading">Team Shortcuts</div>
+      <div class="note-point">Custom commands are the simplest extension. Drop a markdown file in your commands directory, and it becomes a slash command. The filename is the command name. review.md becomes slash-project-review.</div>
+      <div class="note-point">The real power is standardisation. Instead of every engineer writing their own review prompt, you define it once. Slash-review runs git diff against main, injects the actual diff into the prompt, and gives the agent specific criteria to evaluate — bugs, security issues, missing test coverage, performance concerns. Everyone on the team gets the same quality bar.</div>
+      <div class="note-point">Same for onboarding. A slash-onboard command that explains your codebase architecture, key patterns, and dev setup. New team members get a consistent, always-up-to-date introduction from an agent that has actually read every file in the repo.</div>
+      <div class="note-point">In Claude Code, commands have been merged into the skills system — your existing command files still work, but new ones get extra features if you use the skills format. In OpenCode, commands support argument placeholders so you can pass parameters — slash-test Button substitutes "Button" into the template.</div>
+    </div>
+
+    <!-- Slide 12: MCP, Tools, Plugins -->
+    <div class="note-section" data-slide="11">
+      <div class="note-heading">Connecting to the Outside World</div>
+      <div class="note-point">So far everything we've covered is about the agent interacting with your codebase. MCP servers extend the agent's reach to external systems — your database, Slack, GitHub, Jira, internal APIs. The agent can query your database, post to Slack, create GitHub issues — whatever tools the MCP server exposes.</div>
+      <div class="note-point">MCP supports local servers, which run as child processes on your machine, and remote servers over HTTP with optional OAuth. Both tools support MCP but configure it slightly differently — Claude Code uses a dot-mcp.json file, OpenCode puts it in the main config.</div>
+      <div class="note-point">One warning about MCP servers — each one adds to your context window. The GitHub MCP server alone can consume thousands of tokens just in tool descriptions. Be selective. Only enable the servers your agent actually needs for the current project.</div>
+      <div class="note-point">Custom tools in OpenCode deserve a mention. You can define TypeScript functions in the dot-opencode-slash-tools directory that the agent can call. Type-safe with Zod schemas. Claude Code achieves the same thing through MCP servers or plugins.</div>
+      <div class="note-point">And plugins are the packaging layer that bundles everything — skills, hooks, agents, MCP servers — into a single distributable unit. Claude Code uses git-based marketplaces. OpenCode uses npm packages. Both support local development and testing.</div>
+    </div>
+
+    <!-- Slide 13: Modes & Output Styles -->
+    <div class="note-section" data-slide="12">
+      <div class="note-heading">Controlling Agent Behaviour</div>
+      <div class="note-point">Modes and output styles control how the agent behaves without changing your permanent configuration. Think of them as runtime switches.</div>
+      <div class="note-point">Both tools ship with Build mode, which has full tool access, and Plan mode, which is read-only — the agent can analyse and suggest but cannot modify files. OpenCode adds Review and Debug modes out of the box, and you can define custom modes as markdown files.</div>
+      <div class="note-point">The practical tip here is to use Plan mode when you're exploring. Switching to plan mode when you want to understand a new codebase or evaluate architecture options means you can ask aggressive, exploratory questions without worrying about the agent accidentally changing something. Switch back to Build when you're ready to implement.</div>
+      <div class="note-point">Claude Code has output styles, which change how the agent communicates rather than what it can do. The Learning style is worth knowing about — it inserts TODO-human markers in code for the developer to fill in, turning the agent into a teaching tool. Consider this for onboarding junior developers.</div>
+    </div>
+
+    <!-- Slide 14: Memory -->
+    <div class="note-section" data-slide="13">
+      <div class="note-heading">Learning Across Sessions</div>
+      <div class="note-point">Here's something that trips people up. Every session starts with a completely fresh context window. The agent has no memory of what you did yesterday. Memory is the feature that bridges that gap.</div>
+      <div class="note-point">Claude Code has auto-memory built in. As the agent works, it automatically saves observations — commands it discovers work, patterns it notices, architectural insights it picks up. These accumulate in a MEMORY.md index file, and the first two hundred lines load at the start of every session.</div>
+      <div class="note-point">Agent memory is the team-level version. When a subagent discovers something about your codebase, it can persist that knowledge in a shared directory that gets committed to git. Every team member's future sessions benefit from that discovery. There's also a local variant that's gitignored for personal preferences.</div>
+      <div class="note-point">In OpenCode, persistent memory isn't built in — the community letta-memory plugin adds this capability. If your team is on OpenCode, I'd recommend evaluating that plugin early.</div>
+      <div class="note-point">The practical takeaway: when you correct the agent about something, ask yourself whether that correction should be permanent. If you've corrected the same thing twice, it should go in your config — either as a rule, a CLAUDE.md update, or formalised from an auto-memory entry.</div>
+    </div>
+
+    <!-- Slide 15: Lifecycle -->
+    <div class="note-section" data-slide="14">
+      <div class="note-heading">The Five-Stage Journey</div>
+      <div class="note-point">Let me give you the full adoption lifecycle in five stages. Stage one is Bootstrap. Run slash-init. It takes two minutes. It generates your first CLAUDE.md or AGENTS.md from your actual codebase. Commit it immediately. You're already ahead of most teams.</div>
+      <div class="note-point">Stage two is Configure. This is your first week. Set permissions. Deny access to sensitive files. Add rules for your code style and testing conventions. Define your first skill — PR review is the obvious starting point.</div>
+      <div class="note-point">Stage three is Integrate. Connect MCP servers for the services your team uses — your database, GitHub, Slack. Add custom tools for internal APIs. Install community plugins that solve problems you've already identified.</div>
+      <div class="note-point">Stage four is Iterate, and this is the stage that never ends. Use the agent every day. When it makes a mistake, don't just correct it — encode that correction into your configuration. Every correction is a configuration improvement waiting to happen. Auto-memory captures some of these automatically, but the important ones should be formalised into rules or skills.</div>
+      <div class="note-point">Stage five is Scale. Commit your configuration to git. Onboard the rest of the team. Add managed settings for organisation-wide policies. At this point, your agent configuration is living infrastructure — it improves with every sprint, just like your CI pipeline.</div>
+      <div class="note-point">The key message here is that <span class="note-emphasis">this is not a one-time setup</span>. The best configurations I've seen evolve daily. Treat it like your CI pipeline — living infrastructure that gets better every week.</div>
+    </div>
+
+    <!-- Slide 16: Comparison -->
+    <div class="note-section" data-slide="15">
+      <div class="note-heading">Choosing Your Tool</div>
+      <div class="note-point">I won't read every row of this table — it's here as a reference you can come back to. But let me highlight the key differences.</div>
+      <div class="note-point">Claude Code has built-in rules with path scoping, built-in auto-memory, and a richer hook system with four different handler types — shell commands, HTTP, LLM prompts, and agent-based hooks. It's deeply integrated with Anthropic's models.</div>
+      <div class="note-point">OpenCode has a dedicated custom tools directory, built-in modes and themes, and supports any LLM provider — Anthropic, OpenAI, local models, whatever you want. Its plugin system uses JavaScript and TypeScript modules, which gives you more programmatic control.</div>
+      <div class="note-point">The shared ground is actually very large. Both support the Agent Skills standard. Both have agents and subagents. Both support MCP. Both have custom commands. Skills you write for one tool work in the other.</div>
+      <div class="note-point">My recommendation: if your organisation is standardised on Anthropic models, Claude Code offers the tightest integration. If you need multi-provider flexibility or want to use open-source models, OpenCode gives you that freedom. Either way, the configuration concepts are transferable.</div>
+    </div>
+
+    <!-- Slide 17: Best Practices -->
+    <div class="note-section" data-slide="16">
+      <div class="note-heading">What the Best Teams Do</div>
+      <div class="note-point">Six practices that separate teams who get real value from teams who are still fighting with their agent.</div>
+      <div class="note-point">First, <span class="note-emphasis">commit your config to git</span>. This is the single highest-leverage thing you can do. When one engineer figures out the right test command, discovers a gotcha, or writes a skill that saves time — the entire team benefits on their next git pull.</div>
+      <div class="note-point">Second, <span class="note-emphasis">start with the workflow you repeat most</span>. Don't try to build the perfect configuration upfront. Pick one thing. PR review is usually the best starting point because every engineer does it every day. Get that working, iterate on it, then expand.</div>
+      <div class="note-point">Third, <span class="note-emphasis">keep instructions specific and concise</span>. Every line in CLAUDE.md consumes context tokens. Write what the agent can't learn from reading your code. If it's enforced by your linter, don't repeat it in your agent config.</div>
+      <div class="note-point">Fourth, <span class="note-emphasis">iterate on every correction</span>. Every time you correct the agent, that's a signal. If you've corrected the same thing twice, it needs to go in the config. Period.</div>
+      <div class="note-point">Fifth, <span class="note-emphasis">use deny rules for safety</span>. Block .env files, secrets directories, credential stores. Deny rules can't be overridden, even in bypass mode. They're your safety net.</div>
+      <div class="note-point">And sixth, <span class="note-emphasis">scope permissions tightly</span>. Start restrictive and loosen over time. It's much easier to grant new access than to recover from a misconfigured agent that had too much access.</div>
+    </div>
+
+    <!-- Slide 18: Getting Started -->
+    <div class="note-section" data-slide="17">
+      <div class="note-heading">Your Action Plan for This Week</div>
+      <div class="note-point">I want to make this very concrete. Five steps, each one under fifteen minutes. You can do all of these by end of day Friday.</div>
+      <div class="note-point"><span class="note-emphasis">Step one</span>: open a terminal in your project directory and run slash-init. It takes two minutes. Review the generated file, make any obvious corrections, and commit it. That's it. You're configured.</div>
+      <div class="note-point"><span class="note-emphasis">Step two</span>: open that file and make sure your build, test, and lint commands are correct. This single edit eliminates the majority of "wrong command" errors. Five minutes.</div>
+      <div class="note-point"><span class="note-emphasis">Step three</span>: add deny rules for your sensitive files. .env, secrets directory, anything with credentials. Five minutes, and it prevents the most common security concern people raise about these tools.</div>
+      <div class="note-point"><span class="note-emphasis">Step four</span>: create one team skill. I suggest PR review. Write a markdown file that describes how your team reviews PRs — what to check, what standards to apply, what to flag. Put it in your skills directory. Commit it. Now everyone on the team has the same review workflow.</div>
+      <div class="note-point"><span class="note-emphasis">Step five</span>: use the agent on a real task. Not a toy project. Not a hello-world. Real work. You'll immediately discover where your configuration has gaps — and those gaps become your next improvement. That's the iterate stage kicking in.</div>
+      <div class="note-point">I'm happy to pair with anyone who wants help getting their first configuration set up. Hands-on pairing is the fastest way to build confidence with these tools.</div>
+    </div>
+
+    <!-- Slide 19: Closing -->
+    <div class="note-section" data-slide="18">
+      <div class="note-heading">Closing</div>
+      <div class="note-point">Here are the links to the official documentation for both tools. Bookmark them. Both have excellent docs with interactive explorers and real examples.</div>
+      <div class="note-point">If you have questions after today, drop them in our agentic-engineering channel. Share your configurations there too — when someone writes a good skill or discovers a useful hook, the whole team should know about it.</div>
+      <div class="note-point">I'll leave you with this. Your coding agent is only as good as the context you give it. Five minutes of configuration today saves hours of correction tomorrow. And the best time to start was when you first installed the tool. The second best time is right now.</div>
+      <div class="note-point">Step one is slash-init. It takes two minutes. Go do it.</div>
+      <div class="note-point">I'll take questions now.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="deck" id="deck">
+
+<!-- ═══════ SLIDE 1: Title ═══════ -->
+<div class="slide title-slide">
+  <div class="section-label anim">Engineering Enablement</div>
+  <div class="mega-title anim">Configuring Your<br>Coding Agent</div>
+  <div class="mega-subtitle anim">A comprehensive primer on setting up developer workflows, agent development lifecycles, and 2 common agentic engineering harnesses.</div>
+  <div class="tag-line anim">April 2026 · Claude Code · OpenCode</div>
+</div>
+
+<!-- ═══════ SLIDE 2: Why Agentic Engineering ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Context</div>
+  <div class="slide-title anim">Why Agentic Engineering?</div>
+  <div class="slide-subtitle anim">Coding agents are not just autocomplete — they are autonomous collaborators that read your codebase, execute commands, make multi-file edits, and verify their own work. Configuring them properly is the difference between a junior pair-programmer and a senior engineer on your team.</div>
+  <div class="stat-grid anim">
+    <div class="stat-card"><div class="stat-num">60%</div><div class="stat-label">Less time on boilerplate tasks</div></div>
+    <div class="stat-card"><div class="stat-num">3–5×</div><div class="stat-label">Faster PR throughput</div></div>
+    <div class="stat-card"><div class="stat-num">40%</div><div class="stat-label">Fewer context switches</div></div>
+  </div>
+  <div class="callout anim">Without configuration, your agent is generic. With it, your agent knows your stack, your conventions, and your workflows.</div>
+</div>
+
+<!-- ═══════ SLIDE 3: Agenda ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Overview</div>
+  <div class="slide-title anim">What We'll Cover</div>
+  <div class="card-grid cols-2 anim">
+    <div class="card"><div class="card-title accent"><i data-lucide="folder-open"></i> Directory Structure</div><div class="card-desc">Where configuration lives</div></div>
+    <div class="card" data-accent="violet"><div class="card-title violet"><i data-lucide="bot"></i> Agents &amp; Subagents</div><div class="card-desc">Specialised task workers</div></div>
+    <div class="card" data-accent="sky"><div class="card-title sky"><i data-lucide="book-open"></i> Project Instructions</div><div class="card-desc">CLAUDE.md &amp; AGENTS.md</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="zap"></i> Hooks &amp; Automation</div><div class="card-desc">Lifecycle event handlers</div></div>
+    <div class="card" data-accent="green"><div class="card-title green"><i data-lucide="shield-check"></i> Settings &amp; Permissions</div><div class="card-desc">Controlling agent access</div></div>
+    <div class="card" data-accent="rose"><div class="card-title rose"><i data-lucide="plug"></i> MCP, Tools &amp; Plugins</div><div class="card-desc">External integrations</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="clipboard-list"></i> Rules &amp; Skills</div><div class="card-desc">Modular, reusable knowledge</div></div>
+    <div class="card" data-accent="sky"><div class="card-title sky"><i data-lucide="rocket"></i> Development Lifecycle</div><div class="card-desc">Team adoption workflow</div></div>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE 4: Directory Structure ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Foundation</div>
+  <div class="slide-title anim">The Agent Configuration Directory</div>
+  <div class="card-grid cols-2 anim">
+    <div class="code-tree" style="border-top: 3px solid var(--accent)">
+      <div class="tree-header">Claude Code</div>
+      <div class="tree-line"><span>.claude/settings.json</span></div>
+      <div class="tree-line"><span>.claude/rules/</span></div>
+      <div class="tree-line"><span>.claude/skills/</span></div>
+      <div class="tree-line"><span>.claude/agents/</span></div>
+      <div class="tree-line"><span>.claude/commands/</span></div>
+      <div class="tree-line"><span>.claude/agent-memory/</span></div>
+      <div class="tree-line"><span>CLAUDE.md</span></div>
+      <div class="tree-line"><span>.mcp.json</span></div>
+    </div>
+    <div class="code-tree" style="border-top: 3px solid var(--green)">
+      <div class="tree-header" style="color:var(--green)">OpenCode</div>
+      <div class="tree-line"><span>.opencode/ + opencode.json</span></div>
+      <div class="tree-line"><span>.opencode/agents/</span></div>
+      <div class="tree-line"><span>.opencode/skills/</span></div>
+      <div class="tree-line"><span>.opencode/commands/</span></div>
+      <div class="tree-line"><span>.opencode/tools/</span></div>
+      <div class="tree-line"><span>.opencode/plugins/</span></div>
+      <div class="tree-line"><span>.opencode/modes/</span></div>
+      <div class="tree-line"><span>AGENTS.md</span></div>
+    </div>
+  </div>
+  <div class="callout anim">Both tools share the Agent Skills open standard. OpenCode also reads CLAUDE.md and ~/.claude/skills/ for compatibility.</div>
+</div>
+
+<!-- ═══════ SLIDE 5: Project Instructions ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Instructions</div>
+  <div class="slide-title anim">Project Instructions: The Most Important File</div>
+  <div class="slide-subtitle anim">CLAUDE.md (or AGENTS.md for OpenCode) is loaded into every session. It tells the agent what your project is, how to build it, how to test it, and what conventions to follow.</div>
+  <div class="card-grid cols-2 anim">
+    <div class="card"><div class="card-title accent">Build &amp; Test Commands</div><div class="card-desc">npm run dev, npm test, lint scripts — so the agent never guesses</div></div>
+    <div class="card" data-accent="sky"><div class="card-title sky">Architecture Overview</div><div class="card-desc">Tech stack, directory layout, key modules, DB access patterns</div></div>
+    <div class="card" data-accent="violet"><div class="card-title violet">Coding Conventions</div><div class="card-desc">Naming, error handling, import style, forbidden patterns</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber">Non-Obvious Gotchas</div><div class="card-desc">"Tests use a real DB", "Never import X from Y", migration notes</div></div>
+  </div>
+  <div class="tip-box anim">
+    <span class="tip-icon"><i data-lucide="lightbulb"></i></span>
+    <span>Keep it under 200 lines. Longer files consume too much context and reduce instruction adherence. Split into .claude/rules/ or skills when it grows.</span>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE 6: Settings & Permissions ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Security</div>
+  <div class="slide-title anim">Settings &amp; Permissions</div>
+  <div class="slide-subtitle anim">Control what the agent can and cannot do. Deny rules always win over allow rules.</div>
+  <div class="anim">
+    <div class="perm-row"><span class="perm-label">Allow</span><span class="perm-desc">Agent can use the tool without asking</span><span class="perm-ex">Bash(npm run test *)</span></div>
+    <div class="perm-row ask"><span class="perm-label">Ask</span><span class="perm-desc">Agent must request approval each time</span><span class="perm-ex">Bash(rm *)</span></div>
+    <div class="perm-row deny"><span class="perm-label">Deny</span><span class="perm-desc">Tool is blocked — cannot be used at all</span><span class="perm-ex">Read(./.env)</span></div>
+  </div>
+  <div class="callout anim">Settings cascade: Managed (highest) → Project → User (lowest). Deny at any level blocks the tool everywhere.</div>
+</div>
+
+<!-- ═══════ SLIDE 7: Rules ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Instructions</div>
+  <div class="slide-title anim">Rules — Modular, Conditional Instructions</div>
+  <div class="slide-subtitle anim">Split large instruction sets into focused markdown files. Rules can be scoped to specific file paths so they only load when relevant.</div>
+  <div class="card-grid cols-2 anim">
+    <div class="code-tree">
+      <div class="tree-header">.claude/rules/</div>
+      <div class="tree-line">├── <span>code-style.md</span></div>
+      <div class="tree-line">├── <span>testing.md</span></div>
+      <div class="tree-line">├── <span>api-conventions.md</span></div>
+      <div class="tree-line">├── <span>frontend/</span></div>
+      <div class="tree-line">│   └── <span>react-patterns.md</span></div>
+      <div class="tree-line">└── <span>backend/</span></div>
+      <div class="tree-line">    └── <span>db-queries.md</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.7rem">
+      <div class="card"><div class="card-title accent">One topic per file</div><div class="card-desc">Descriptive filenames for easy scanning</div></div>
+      <div class="card" data-accent="green"><div class="card-title green">Path scoping (globs)</div><div class="card-desc">Load only for matching files</div></div>
+      <div class="card" data-accent="violet"><div class="card-title violet">Recursive discovery</div><div class="card-desc">Subdirectories auto-discovered</div></div>
+      <div class="card" data-accent="amber"><div class="card-title amber">Always-on or on-demand</div><div class="card-desc">Rules load every session; skills load when needed</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE 8: Skills ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Workflows</div>
+  <div class="slide-title anim">Skills — Reusable Workflows &amp; Knowledge</div>
+  <div class="slide-subtitle anim">Each skill is a directory with a SKILL.md file. They can be invoked as slash commands or auto-loaded by the agent when the task matches.</div>
+  <div class="card-grid cols-2 anim">
+    <div class="code-tree">
+      <div class="tree-header">Skill Anatomy</div>
+      <div class="tree-line" style="color:var(--muted)">---</div>
+      <div class="tree-line" style="color:var(--accent)">name: deploy</div>
+      <div class="tree-line" style="color:var(--accent)">description: Deploy to staging</div>
+      <div class="tree-line" style="color:var(--accent)">allowed-tools: Bash(git *)</div>
+      <div class="tree-line" style="color:var(--muted)">---</div>
+      <div class="tree-line"><span>Run the deploy pipeline...</span></div>
+      <div class="tree-line"><span>1. Pull latest main...</span></div>
+      <div class="tree-line"><span>2. Run npm run build...</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.7rem">
+      <div class="card"><div class="card-title accent"><code>/deploy</code></div><div class="card-desc">You invoke it directly as a slash command</div></div>
+      <div class="card" data-accent="green"><div class="card-title green">Auto-loaded</div><div class="card-desc">Agent detects relevance from your prompt</div></div>
+      <div class="card" data-accent="violet"><div class="card-title violet">Subagent context</div><div class="card-desc">Injected into a subagent's startup context</div></div>
+      <div class="card" data-accent="amber"><div class="card-title amber">Model-invocation</div><div class="card-desc">Agent calls the Skill tool programmatically</div></div>
+    </div>
+  </div>
+  <div class="callout anim">Skills follow the open Agent Skills standard — compatible across Claude Code, OpenCode, and Codex.</div>
+</div>
+
+<!-- ═══════ SLIDE 9: Agents & Subagents ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Delegation</div>
+  <div class="slide-title anim">Agents &amp; Subagents — Specialised Workers</div>
+  <div class="slide-subtitle anim">Subagents run in isolated context with their own tools, models, and permissions. They do focused work without bloating your main conversation.</div>
+  <div class="card-grid cols-3 anim">
+    <div class="card" data-accent="rose"><div class="card-title rose"><i data-lucide="shield-check"></i> Code Reviewer</div><div class="card-desc">Read-only. Scans diffs for bugs, style issues, and security concerns.</div></div>
+    <div class="card"><div class="card-title accent"><i data-lucide="compass"></i> Explore (Spec Oracle)</div><div class="card-desc">Answers product-contextual questions on behalf of working agents, keeping their context lean and focused.</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="calendar-range"></i> Sprint Planner</div><div class="card-desc">Decomposes epics into sprint-sized tasks with estimates, dependencies, and acceptance criteria.</div></div>
+    <div class="card" data-accent="green"><div class="card-title green"><i data-lucide="pen-line"></i> Technical Writer</div><div class="card-desc">Generates and maintains docs, READMEs, ADRs, and API references from code changes.</div></div>
+    <div class="card" data-accent="violet"><div class="card-title violet"><i data-lucide="shield-alert"></i> QA Guardian (Strict)</div><div class="card-desc">Authors test plans, reviews designs for testability, writes Playwright e2e tests, hunts edge cases, and collaborates during development.</div></div>
+    <div class="card" data-accent="sky"><div class="card-title sky"><i data-lucide="telescope"></i> Researcher</div><div class="card-desc">Deep-dives into documentation, APIs, and codebases to surface answers, prior art, and options.</div></div>
+  </div>
+  <div class="callout anim" style="font-style:normal;color:var(--muted);font-size:0.72rem"><code style="color:var(--muted)">Frontmatter: name, description, model, tools, disallowedTools, permissionMode, hooks, skills, maxTurns, memory, isolation</code></div>
+</div>
+
+<!-- ═══════ SLIDE 10: Hooks ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Automation</div>
+  <div class="slide-title anim">Hooks — Lifecycle Automation</div>
+  <div class="slide-subtitle anim">Hooks fire at specific lifecycle points. They provide deterministic control — ensuring actions always happen rather than relying on the LLM to choose.</div>
+  <div class="hook-flow anim">
+    <div class="hook-card"><div class="hook-name">SessionStart</div><div class="hook-desc">Session begins</div></div>
+    <div class="hook-card"><div class="hook-name">PreToolUse</div><div class="hook-desc">Before a tool executes</div></div>
+    <div class="hook-card"><div class="hook-name">PostToolUse</div><div class="hook-desc">After a tool completes</div></div>
+    <div class="hook-card"><div class="hook-name">Stop</div><div class="hook-desc">Agent finishes its turn</div></div>
+  </div>
+  <div class="card-grid cols-2 anim">
+    <div class="card"><div class="card-title accent">Command</div><div class="card-desc">Shell script — receives JSON on stdin, returns via exit code</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber">HTTP</div><div class="card-desc">POST to a URL — same JSON format, response as body</div></div>
+    <div class="card" data-accent="violet"><div class="card-title violet">Prompt / Agent</div><div class="card-desc">LLM evaluates a condition, returns yes/no decision</div></div>
+    <div class="card" data-accent="green"><div class="card-title green">Plugin Events</div><div class="card-desc">JS/TS module subscribes to tool.execute.before/after events (OpenCode)</div></div>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE 11: Commands ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Productivity</div>
+  <div class="slide-title anim">Custom Commands — Your Team's Shortcuts</div>
+  <div class="slide-subtitle anim">Every markdown file in the commands/ directory becomes a slash command. Standardise repetitive workflows across the team.</div>
+  <div class="anim" style="display:flex;flex-direction:column;gap:0.6rem">
+    <div class="card"><div class="card-title accent mono">/project:review</div><div class="card-desc">Run git diff against main, review for bugs, security, and missing tests</div></div>
+    <div class="card" data-accent="green"><div class="card-title green mono">/project:fix-issue</div><div class="card-desc">Take a GitHub issue number, reproduce, fix, and create a PR</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber mono">/project:deploy</div><div class="card-desc">Run the full staging deploy pipeline with pre-flight checks</div></div>
+    <div class="card" data-accent="violet"><div class="card-title violet mono">/project:onboard</div><div class="card-desc">Explain the codebase architecture, key patterns, and dev setup</div></div>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE 12: MCP, Tools, Plugins ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Integrations</div>
+  <div class="slide-title anim">MCP Servers, Custom Tools &amp; Plugins</div>
+  <div class="card-grid cols-3 anim">
+    <div class="card" style="border-top:3px solid var(--accent)">
+      <div class="card-title accent" style="font-size:1.05rem;margin-bottom:0.8rem"><i data-lucide="plug"></i> MCP Servers</div>
+      <div class="card-desc" style="line-height:2">
+        • Connect to databases, APIs, Slack, GitHub<br>
+        • Local (stdio) or remote (HTTP/SSE)<br>
+        • Claude Code: <code>.mcp.json</code><br>
+        • OpenCode: <code>opencode.json</code> mcp key<br>
+        • Tools auto-available to agents
+      </div>
+    </div>
+    <div class="card" data-accent="green" style="border-top:3px solid var(--green)">
+      <div class="card-title green" style="font-size:1.05rem;margin-bottom:0.8rem"><i data-lucide="wrench"></i> Custom Tools</div>
+      <div class="card-desc" style="line-height:2">
+        • OpenCode: <code>.opencode/tools/</code><br>
+        • TypeScript/JS tool definitions<br>
+        • Can invoke scripts in any language<br>
+        • Type-safe with Zod schemas<br>
+        • Claude Code: via MCP or plugins
+      </div>
+    </div>
+    <div class="card" data-accent="violet" style="border-top:3px solid var(--accent3)">
+      <div class="card-title violet" style="font-size:1.05rem;margin-bottom:0.8rem"><i data-lucide="puzzle"></i> Plugins</div>
+      <div class="card-desc" style="line-height:2">
+        • Bundle skills + hooks + agents + MCP<br>
+        • Share across projects &amp; teams<br>
+        • Claude Code: marketplaces + git repos<br>
+        • OpenCode: npm packages + local JS/TS<br>
+        • Namespaced to avoid conflicts
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE 13: Modes & Output Styles ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Behaviour</div>
+  <div class="slide-title anim">Modes &amp; Output Styles</div>
+  <div class="slide-subtitle anim">Modes restrict tools and set system prompts. Output styles change formatting and tone without changing capabilities.</div>
+  <div class="card-grid cols-2 anim">
+    <div style="display:flex;flex-direction:column;gap:0.6rem">
+      <div class="card" data-accent="green"><div class="card-title green">Build</div><div class="card-desc">All tools enabled. Default for development work.</div></div>
+      <div class="card"><div class="card-title accent">Plan</div><div class="card-desc">Read-only analysis. No file edits, no destructive commands.</div></div>
+      <div class="card" data-accent="amber"><div class="card-title amber">Review</div><div class="card-desc">Code review focus. Read + documentation tools only. (OpenCode)</div></div>
+      <div class="card" data-accent="rose"><div class="card-title rose">Debug</div><div class="card-desc">Investigation mode. Bash + read tools, no writes. (OpenCode)</div></div>
+    </div>
+    <div class="card" data-accent="violet" style="border-top:3px solid var(--accent3)">
+      <div class="card-title violet" style="font-size:1.05rem;margin-bottom:0.6rem">Output Styles <span style="font-size:0.75rem;color:var(--muted)">(Claude Code)</span></div>
+      <div class="card-desc" style="line-height:2.2">
+        • <strong>Default</strong> — standard coding assistant<br>
+        • <strong>Explanatory</strong> — adds educational insights<br>
+        • <strong>Learning</strong> — collaborative, includes TODO(human)<br>
+        • <strong>Custom</strong> — your own markdown definitions
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE 14: Memory ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Persistence</div>
+  <div class="slide-title anim">Memory — Persistent Learning Across Sessions</div>
+  <div class="slide-subtitle anim">Sessions are independent — each starts with a fresh context window. Memory bridges the gap, allowing the agent to accumulate project knowledge over time.</div>
+  <div class="anim" style="display:flex;flex-direction:column;gap:0.8rem">
+    <div class="card"><div class="card-title accent">Auto-Memory</div><div class="card-desc">Claude Code saves observations automatically — commands it discovers, patterns it notices, architecture insights. Stored in ~/.claude/projects/&lt;hash&gt;/memory/ with a MEMORY.md index.</div></div>
+    <div class="card-grid cols-2" style="gap:0.8rem">
+      <div class="card" data-accent="green"><div class="card-title green">Agent Memory (shared)</div><div class="card-desc">Subagents persist knowledge in .claude/agent-memory/&lt;name&gt;/. Committed to git so the whole team benefits.</div></div>
+      <div class="card" data-accent="violet"><div class="card-title violet">Agent Memory (local)</div><div class="card-desc">Personal subagent memory in .claude/agent-memory-local/. Gitignored for your own notes.</div></div>
+    </div>
+  </div>
+  <div class="callout anim">Memory files use YAML frontmatter with types: user, feedback, project, reference. The first 200 lines / 25 KB load each session.</div>
+</div>
+
+<!-- ═══════ SLIDE 15: Lifecycle ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Lifecycle</div>
+  <div class="slide-title anim">The Agent Development Lifecycle</div>
+  <div class="flow-grid anim">
+    <div class="flow-step"><div class="flow-num">01</div><div class="flow-title">Bootstrap</div><div class="flow-desc">Run /init to generate CLAUDE.md / AGENTS.md from your codebase</div></div>
+    <div class="flow-step"><div class="flow-num">02</div><div class="flow-title">Configure</div><div class="flow-desc">Set permissions, add rules, define skills and subagents</div></div>
+    <div class="flow-step"><div class="flow-num">03</div><div class="flow-title">Integrate</div><div class="flow-desc">Connect MCP servers, add custom tools, install plugins</div></div>
+    <div class="flow-step"><div class="flow-num">04</div><div class="flow-title">Iterate</div><div class="flow-desc">Use the agent daily. Refine instructions from feedback and memory</div></div>
+    <div class="flow-step"><div class="flow-num">05</div><div class="flow-title">Scale</div><div class="flow-desc">Commit config to git. Onboard team. Add managed policies.</div></div>
+  </div>
+  <div class="callout anim">This is not a one-time setup. The best agent configurations evolve continuously as the team learns what works.</div>
+</div>
+
+<!-- ═══════ SLIDE 16: Comparison Table ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Comparison</div>
+  <div class="slide-title anim">Claude Code vs OpenCode</div>
+  <div class="anim" style="overflow-x:auto">
+    <table class="comparison-table">
+      <thead><tr><th>Feature</th><th>Claude Code</th><th>OpenCode</th></tr></thead>
+      <tbody>
+        <tr><td>Project instructions</td><td>CLAUDE.md</td><td>AGENTS.md</td></tr>
+        <tr><td>Settings file</td><td>settings.json</td><td>opencode.json</td></tr>
+        <tr><td>Rules directory</td><td>✓ Built-in, path-scoped</td><td>Via plugin</td></tr>
+        <tr><td>Skills</td><td>✓ Agent Skills standard</td><td>✓ Agent Skills standard</td></tr>
+        <tr><td>Agents / Subagents</td><td>✓ .claude/agents/</td><td>✓ .opencode/agents/</td></tr>
+        <tr><td>Hooks</td><td>JSON: cmd, HTTP, prompt, agent</td><td>JS/TS plugin event system</td></tr>
+        <tr><td>Custom slash commands</td><td>✓ commands/ (merged w/ skills)</td><td>✓ commands/</td></tr>
+        <tr><td>Custom tools directory</td><td>— (via MCP)</td><td>✓ .opencode/tools/</td></tr>
+        <tr><td>Modes</td><td>Output styles</td><td>✓ .opencode/modes/</td></tr>
+        <tr><td>Themes</td><td>—</td><td>✓ .opencode/themes/</td></tr>
+        <tr><td>Agent memory</td><td>✓ Built-in auto-memory</td><td>Via plugin (letta-memory)</td></tr>
+        <tr><td>Plugins</td><td>Marketplace + git repos</td><td>npm packages + local JS/TS</td></tr>
+        <tr><td>LLM providers</td><td>Anthropic (+ Bedrock/Vertex)</td><td>Any (Anthropic, OpenAI, etc.)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE 17: Best Practices ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Guidance</div>
+  <div class="slide-title anim">Best Practices for Your Team</div>
+  <div class="card-grid cols-2 anim">
+    <div class="card" data-accent="green"><div class="card-title green"><i data-lucide="circle-check"></i> Commit your config to git</div><div class="card-desc">CLAUDE.md, settings.json, skills/, agents/ — everyone on the team benefits. Use .local files for personal preferences.</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="rocket"></i> Start with skills you use daily</div><div class="card-desc">PR review, test writing, deployment — automate the workflows your team repeats most.</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber"><i data-lucide="lightbulb"></i> Keep instructions specific and concise</div><div class="card-desc">Write what the agent can't figure out from reading code. Target under 200 lines; split into rules or skills.</div></div>
+    <div class="card" data-accent="violet"><div class="card-title violet"><i data-lucide="brain"></i> Iterate based on corrections</div><div class="card-desc">When you correct the agent, add that guidance to your config. Auto-memory captures patterns; formalise the important ones.</div></div>
+    <div class="card" data-accent="rose"><div class="card-title rose"><i data-lucide="shield-check"></i> Use deny rules for safety</div><div class="card-desc">Block access to .env, secrets/, and sensitive paths. Deny rules always win, even in bypass mode.</div></div>
+    <div class="card" data-accent="sky"><div class="card-title sky"><i data-lucide="settings"></i> Scope permissions tightly</div><div class="card-desc">Allow only the tools and commands the agent actually needs. Expand as trust builds. Audit with /permissions.</div></div>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE 18: Getting Started ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Action</div>
+  <div class="slide-title anim">Getting Started — This Week</div>
+  <div class="step-list anim">
+    <div class="step-item"><div class="step-num">1</div><div><div class="step-content-title">Run /init in your project</div><div class="step-content-desc">Generate a starting CLAUDE.md / AGENTS.md from your codebase. Commit it to your repo.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div><div class="step-content-title">Add your build &amp; test commands</div><div class="step-content-desc">Ensure the agent knows how to build, test, lint, and deploy. This alone eliminates most wrong guesses.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div><div class="step-content-title">Set sensible permissions</div><div class="step-content-desc">Deny access to secrets and sensitive files. Allow common safe commands (git, npm test) without prompting.</div></div></div>
+    <div class="step-item"><div class="step-num">4</div><div><div class="step-content-title">Create one team skill</div><div class="step-content-desc">Pick your most common workflow — PR review is a great first skill. Share it with the team.</div></div></div>
+    <div class="step-item"><div class="step-num">5</div><div><div class="step-content-title">Use it for a real task</div><div class="step-content-desc">Don't sandbox it in a toy project. Use the agent on real work and note where it stumbles — that's your next config improvement.</div></div></div>
+  </div>
+  <div class="callout anim">The best time to configure your agent was when you started using it. The second best time is now.</div>
+</div>
+
+<!-- ═══════ SLIDE 19: Closing ═══════ -->
+<div class="slide closing-slide">
+  <div class="section-label anim">Resources</div>
+  <div class="mega-title anim" style="font-family:var(--font-h);font-size:clamp(2.5rem,4.5vw,3.8rem);font-weight:900;line-height:1.1;margin-bottom:1.5rem">Start Building<br>With Your Agent</div>
+  <ul class="resource-list anim">
+    <li><strong>code.claude.com/docs</strong> — Claude Code official documentation</li>
+    <li><strong>opencode.ai/docs</strong> — OpenCode official documentation</li>
+    <li><strong>github.com/anthropics/claude-code</strong> — Releases &amp; changelog</li>
+    <li><strong>Agent Skills spec</strong> — Open standard for portable skills</li>
+    <li><strong>Your team's #agentic-engineering channel</strong></li>
+  </ul>
+  <div class="anim" style="margin-top:2rem;border-top:2px solid var(--accent);padding-top:1rem;font-size:1rem">
+    Questions? Let's configure your first agent together.
+  </div>
+</div>
+
+</div><!-- end .deck -->
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const progress = document.getElementById('progress');
+const counter = document.getElementById('counter');
+let current = 0;
+
+function show(idx) {
+  slides.forEach((s, i) => {
+    s.classList.remove('active', 'exit-left');
+    if (i < idx) s.classList.add('exit-left');
+  });
+  slides[idx].classList.add('active');
+  const pct = ((idx + 1) / slides.length) * 100;
+  progress.style.width = pct + '%';
+  counter.textContent = (idx + 1) + ' / ' + slides.length;
+  syncNotes(idx);
+}
+
+// ── Notes panel ──
+const notesPanel = document.getElementById('notesPanel');
+const notesSlideLabel = document.getElementById('notesSlideLabel');
+const noteSections = document.querySelectorAll('.note-section');
+let notesOpen = true;
+
+// Show notes by default
+notesPanel.classList.add('open');
+document.body.classList.add('notes-open');
+document.getElementById('deck').classList.add('notes-pushed');
+
+function toggleNotes() {
+  notesOpen = !notesOpen;
+  notesPanel.classList.toggle('open', notesOpen);
+  document.body.classList.toggle('notes-open', notesOpen);
+  document.getElementById('deck').classList.toggle('notes-pushed', notesOpen);
+  if (notesOpen) syncNotes(current);
+}
+
+function syncNotes(idx) {
+  noteSections.forEach(s => s.classList.remove('active'));
+  const active = document.querySelector(`.note-section[data-slide="${idx}"]`);
+  if (active) active.classList.add('active');
+  notesSlideLabel.textContent = `Slide ${idx + 1} of ${slides.length}`;
+  // Scroll notes to top when changing slides
+  const content = document.querySelector('.notes-content');
+  if (content) content.scrollTop = 0;
+}
+
+function next() { if (current < slides.length - 1) { current++; show(current); } }
+function prev() { if (current > 0) { current--; show(current); } }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  if (e.key === 'Home') { e.preventDefault(); current = 0; show(current); }
+  if (e.key === 'End') { e.preventDefault(); current = slides.length - 1; show(current); }
+  if (e.key === 'n' || e.key === 'N') { e.preventDefault(); toggleNotes(); }
+});
+
+// Touch swipe support
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (dx < -50) next();
+  if (dx > 50) prev();
+});
+
+show(0);
+
+// ── Inline Lucide-compatible SVG icons (no CDN needed) ──
+const ICONS = {
+  'folder-open': '<path d="M6 14 1.5 9.5a1 1 0 0 1-.15-1.06l1.27-2.54A2 2 0 0 1 4.41 5H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2 2h5"/><path d="M2 10h20"/>',
+  'bot': '<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+  'book-open': '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  'zap': '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  'shield-check': '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  'plug': '<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-6 6a6 6 0 0 1-6-6V8z"/>',
+  'clipboard-list': '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',
+  'rocket': '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',
+  'circle-check': '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  'search': '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  'brain': '<path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/>',
+  'wrench': '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  'puzzle': '<path d="M15.39 4.39a1 1 0 0 0 .61.93A3 3 0 0 1 18 8a3 3 0 0 1-2 2.82 1 1 0 0 0-.61.93V14a2 2 0 0 1-2 2h-2.18a1 1 0 0 0-.93.61A3 3 0 0 1 8 18a3 3 0 0 1-2.82-2 1 1 0 0 0-.93-.61H2V9.39a1 1 0 0 0 .61-.93A3 3 0 0 1 2 6c.87 0 1.69.37 2.25 1.03a1 1 0 0 0 .93.36H9.4a1 1 0 0 0 .93-.61A3 3 0 0 1 12 6c.56 0 1.09.15 1.54.42a1 1 0 0 0 .93-.03z"/><path d="M15.39 4.39V2h6v6h-2.39"/>',
+  'lightbulb': '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+  'settings': '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+  'network': '<rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/>',
+  'compass': '<path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/><circle cx="12" cy="12" r="10"/>',
+  'calendar-range': '<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M17 14h-6"/><path d="M13 18H7"/><path d="M7 14h.01"/><path d="M17 18h.01"/>',
+  'pen-line': '<path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/>',
+  'shield-alert': '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  'telescope': '<path d="m10.065 12.493-6.18 1.318a.934.934 0 0 1-1.108-.702l-.537-2.15a1.07 1.07 0 0 1 .691-1.265l13.504-4.44"/><path d="m13.56 11.747 4.332-.924"/><path d="m16 21-3.105-6.21"/><path d="M16.485 5.94a2 2 0 0 1 1.455-2.425l1.09-.272a1 1 0 0 1 1.212.727l1.515 6.06a1 1 0 0 1-.727 1.213l-1.09.272a2 2 0 0 1-2.425-1.455z"/><path d="m6.158 8.633 1.114 4.456"/><path d="m8 21 3.105-6.21"/>',
+};
+
+document.querySelectorAll('[data-lucide]').forEach(el => {
+  const name = el.getAttribute('data-lucide');
+  const svg = ICONS[name];
+  if (!svg) return;
+  const ns = 'http://www.w3.org/2000/svg';
+  const svgEl = document.createElementNS(ns, 'svg');
+  svgEl.setAttribute('viewBox', '0 0 24 24');
+  svgEl.setAttribute('fill', 'none');
+  svgEl.setAttribute('stroke', 'currentColor');
+  svgEl.setAttribute('stroke-width', '2');
+  svgEl.setAttribute('stroke-linecap', 'round');
+  svgEl.setAttribute('stroke-linejoin', 'round');
+  svgEl.classList.add('lucide');
+  svgEl.innerHTML = svg;
+  el.replaceWith(svgEl);
+});
+</script>
+</body>
+</html>
