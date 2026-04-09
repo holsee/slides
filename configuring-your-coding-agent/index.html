@@ -544,6 +544,8 @@ body::after {
 /* ── Closing slide ── */
 .closing-slide {
   position: relative;
+  justify-content: flex-start;
+  padding-top: 8vh;
 }
 .closing-slide::after {
   content: '';
@@ -828,6 +830,12 @@ body.notes-open .kb-hint {
   bottom: calc(42vh + 1vh);
 }
 body.notes-open .progress { z-index: 200; }
+
+/* ── Closing slide adjustments when notes open ── */
+.deck.notes-pushed .closing-slide { padding-top: 3vh; }
+.deck.notes-pushed .closing-slide .mega-title { font-size: clamp(1.4rem, 3vw, 2.2rem) !important; margin-bottom: 0.6rem !important; }
+.deck.notes-pushed .closing-slide .resource-list li { padding: 0.15rem 0 0.15rem 1.5rem; font-size: 0.72rem; }
+.deck.notes-pushed .closing-slide [style*="margin-top:2rem"] { margin-top: 0.8rem !important; padding-top: 0.6rem !important; font-size: 0.85rem !important; }
 </style>
 </head>
 <body>
