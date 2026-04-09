@@ -8,6 +8,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@400;500;600;700&display=swap');
 
 :root {
+  --notes-h: 30vh;
   --bg: #020810;
   --bg-alt: #0a1628;
   --bg-card: #0c1a2e;
@@ -92,7 +93,7 @@ body::after {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: 8vh 6vw;
+  padding: 6vh 6vw 6vh;
   opacity: 0;
   transform: translateY(6px);
   pointer-events: none;
@@ -740,7 +741,7 @@ code {
   flex-direction: column;
 }
 .notes-panel.open {
-  height: 42vh;
+  height: var(--notes-h);
 }
 
 /* ── Scanlines for notes panel ── */
@@ -759,6 +760,30 @@ code {
   z-index: 1;
 }
 
+/* ── Drag handle ── */
+.notes-drag {
+  position: absolute;
+  top: -6px; left: 0; right: 0;
+  height: 12px;
+  cursor: ns-resize;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.notes-drag::after {
+  content: '';
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background: #5a3a00;
+  transition: background 0.2s;
+}
+.notes-drag:hover::after,
+.notes-drag.dragging::after {
+  background: #f0a030;
+}
+
 /* ── Notes header bar ── */
 .notes-header {
   display: flex;
@@ -769,6 +794,7 @@ code {
   flex-shrink: 0;
   position: relative;
   z-index: 2;
+  cursor: ns-resize;
 }
 .notes-header-title {
   font-size: 0.7rem;
@@ -872,7 +898,7 @@ code {
 
 /* ── Shift main deck up when notes open ── */
 .deck.notes-pushed {
-  height: 58vh !important;
+  height: calc(100vh - var(--notes-h)) !important;
 }
 .deck.notes-pushed .slide {
   padding-bottom: 2vh;
@@ -882,7 +908,7 @@ code {
 body.notes-open .counter,
 body.notes-open .nav-arrows,
 body.notes-open .kb-hint {
-  bottom: calc(42vh + 1vh);
+  bottom: calc(var(--notes-h) + 1vh);
   z-index: 200;
 }
 body.notes-open .progress { z-index: 200; }
@@ -904,7 +930,8 @@ body.notes-open .progress { z-index: 200; }
 <div class="kb-hint"><kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> · <kbd class="kb-orange clickable" onclick="toggleNotes()">N</kbd> notes</div>
 
 <div class="notes-panel" id="notesPanel" role="complementary" aria-label="Speaker notes">
-  <div class="notes-header">
+  <div class="notes-drag" id="notesDrag"></div>
+  <div class="notes-header" id="notesHeader">
     <span class="notes-header-title">// Speaker Notes</span>
     <span class="notes-header-slide" id="notesSlideLabel">Slide 1 of 22</span>
   </div>
@@ -1668,6 +1695,51 @@ document.addEventListener('touchend', e => {
 
 current = slideFromHash();
 show(current);
+
+// ── Drag-resize notes panel ──
+(function() {
+  const drag = document.getElementById('notesDrag');
+  const header = document.getElementById('notesHeader');
+  const root = document.documentElement;
+  const MIN_H = 12; // vh
+  const MAX_H = 65; // vh
+  let dragging = false;
+
+  function startDrag(e) {
+    if (!notesOpen) return;
+    dragging = true;
+    drag.classList.add('dragging');
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'ns-resize';
+    e.preventDefault();
+  }
+
+  function onDrag(e) {
+    if (!dragging) return;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const vh = ((window.innerHeight - clientY) / window.innerHeight) * 100;
+    const clamped = Math.max(MIN_H, Math.min(MAX_H, vh));
+    root.style.setProperty('--notes-h', clamped + 'vh');
+  }
+
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    drag.classList.remove('dragging');
+    document.body.style.userSelect = '';
+    document.body.style.cursor = '';
+  }
+
+  drag.addEventListener('mousedown', startDrag);
+  header.addEventListener('mousedown', startDrag);
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('mouseup', endDrag);
+
+  drag.addEventListener('touchstart', startDrag, { passive: false });
+  header.addEventListener('touchstart', startDrag, { passive: false });
+  document.addEventListener('touchmove', onDrag, { passive: false });
+  document.addEventListener('touchend', endDrag);
+})();
 
 // ── Inline Lucide-compatible SVG icons (no CDN needed) ──
 const ICONS = {
