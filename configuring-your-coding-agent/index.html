@@ -977,7 +977,7 @@ body.notes-open .progress { z-index: 200; }
   <div class="notes-drag" id="notesDrag"></div>
   <div class="notes-header" id="notesHeader">
     <span class="notes-header-title">// Speaker Notes</span>
-    <span class="notes-header-slide" id="notesSlideLabel">Slide 1 of 22</span>
+    <span class="notes-header-slide" id="notesSlideLabel">Slide 1 of 23</span>
   </div>
   <div class="notes-content">
 
@@ -1120,7 +1120,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 13: Modes & Output Styles -->
-    <div class="note-section" data-slide="15">
+    <div class="note-section" data-slide="16">
       <div class="note-heading">Controlling Agent Behaviour</div>
       <div class="note-point">Modes and output styles control how the agent behaves without changing your permanent configuration. Think of them as runtime switches.</div>
       <div class="note-point">Both tools ship with Build mode, which has full tool access, and Plan mode, which is read-only — the agent can analyse and suggest but cannot modify files. OpenCode adds Review and Debug modes out of the box, and you can define custom modes as markdown files.</div>
@@ -1129,7 +1129,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 14: Memory -->
-    <div class="note-section" data-slide="16">
+    <div class="note-section" data-slide="17">
       <div class="note-heading">Learning Across Sessions</div>
       <div class="note-point">Here's something that trips people up. Every session starts with a completely fresh context window. The agent has no memory of what you did yesterday. Memory is the feature that bridges that gap.</div>
       <div class="note-point">Claude Code has auto-memory built in. As the agent works, it automatically saves observations — commands it discovers work, patterns it notices, architectural insights it picks up. These accumulate in a MEMORY.md index file, and the first two hundred lines load at the start of every session.</div>
@@ -1138,8 +1138,17 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">The practical takeaway: when you correct the agent about something, ask yourself whether that correction should be permanent. If you've corrected the same thing twice, it should go in your config — either as a rule, a CLAUDE.md update, or formalised from an auto-memory entry.</div>
     </div>
 
+    <!-- Slide 14b: Agent Memory -->
+    <div class="note-section" data-slide="15">
+      <div class="note-heading">Agent Memory — How It Works</div>
+      <div class="note-point">This is the mechanism that makes subagents genuinely useful over time. You add one line to your agent's frontmatter — <span class="note-emphasis">memory: project</span>, or local, or user — and the agent gets persistent storage.</div>
+      <div class="note-point">Here's what happens under the hood. When the agent starts, Claude Code loads the first 200 lines of its MEMORY.md file into context. Read, Write, and Edit tools are automatically enabled for the memory directory. The agent decides what's worth remembering — patterns it discovers, solutions to problems, architectural insights — and writes them to its memory files.</div>
+      <div class="note-point">Three scopes. <span class="note-emphasis">Project</span> memory lives in .claude/agent-memory/ and gets committed to git. This is the most powerful option — when your code reviewer learns something about your codebase, every team member's future reviews benefit. <span class="note-emphasis">Local</span> memory is gitignored, for personal notes. <span class="note-emphasis">User</span> memory is global across all projects on your machine.</div>
+      <div class="note-point">The key insight: you don't write the memories. The agent does. Your job is to choose the right scope and let the agent accumulate knowledge naturally. Over weeks and months, a subagent with project memory becomes increasingly valuable — it knows your codebase's quirks, your team's patterns, your common pitfalls.</div>
+    </div>
+
     <!-- Slide 15: Lifecycle -->
-    <div class="note-section" data-slide="17">
+    <div class="note-section" data-slide="18">
       <div class="note-heading">The Five-Stage Journey</div>
       <div class="note-point">Let me give you the full adoption lifecycle in five stages. Stage one is Bootstrap. Run slash-init. It takes two minutes. It generates your first CLAUDE.md or AGENTS.md from your actual codebase. Commit it immediately. You're already ahead of most teams.</div>
       <div class="note-point">Stage two is Configure. This is your first week. Set permissions. Deny access to sensitive files. Add rules for your code style and testing conventions. Define your first skill — PR review is the obvious starting point.</div>
@@ -1150,7 +1159,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 16: Comparison -->
-    <div class="note-section" data-slide="18">
+    <div class="note-section" data-slide="19">
       <div class="note-heading">Choosing Your Tool</div>
       <div class="note-point">I won't read every row of this table — it's here as a reference you can come back to. But let me highlight the key differences.</div>
       <div class="note-point">Claude Code has built-in rules with path scoping, built-in auto-memory, and a richer hook system with four different handler types — shell commands, HTTP, LLM prompts, and agent-based hooks. It's deeply integrated with Anthropic's models.</div>
@@ -1160,7 +1169,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 20: Best Practices -->
-    <div class="note-section" data-slide="19">
+    <div class="note-section" data-slide="20">
       <div class="note-heading">What the Best Teams Do</div>
       <div class="note-point">Six practices that separate teams who get real value from teams who are still fighting with their agent.</div>
       <div class="note-point">First, <span class="note-emphasis">commit your config to git</span>. This is the single highest-leverage thing you can do. When one engineer figures out the right test command, discovers a gotcha, or writes a skill that saves time — the entire team benefits on their next git pull.</div>
@@ -1172,7 +1181,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 18: Getting Started -->
-    <div class="note-section" data-slide="20">
+    <div class="note-section" data-slide="21">
       <div class="note-heading">Your Action Plan for This Week</div>
       <div class="note-point">I want to make this very concrete. Five steps, each one under fifteen minutes. You can do all of these by end of day Friday.</div>
       <div class="note-point"><span class="note-emphasis">Step one</span>: open a terminal in your project directory and run slash-init. It takes two minutes. Review the generated file, make any obvious corrections, and commit it. That's it. You're configured.</div>
@@ -1184,7 +1193,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 22: Closing -->
-    <div class="note-section" data-slide="21">
+    <div class="note-section" data-slide="22">
       <div class="note-heading">Closing</div>
       <div class="note-point">Here are the links to the official documentation for both tools. Bookmark them. Both have excellent docs with interactive explorers and real examples.</div>
       <div class="note-point">If you have questions after today, drop them in our agentic-engineering channel. Share your configurations there too — when someone writes a good skill or discovers a useful hook, the whole team should know about it.</div>
@@ -1567,12 +1576,42 @@ with a story, not a lecture.</div>
   <div class="slide-title anim">Memory — Persistent Learning Across Sessions</div>
   <div class="slide-subtitle anim">Each session starts fresh. Memory bridges the gap — accumulating project knowledge over time.</div>
   <div class="card-grid cols-2 anim">
-    <div class="card"><div class="card-title accent">Auto-Memory</div><div class="card-desc">Saves observations automatically — commands, patterns, architecture. Stored in ~/.claude/projects/ with MEMORY.md index.</div></div>
-    <div class="card" data-accent="amber"><div class="card-title amber">Auto-Dream</div><div class="card-desc">Background memory consolidation between sessions. Claude reviews transcripts, extracts insights, and updates memory files while you're away.</div></div>
-    <div class="card" data-accent="green"><div class="card-title green">Shared Agent Memory</div><div class="card-desc">Subagents persist in .claude/agent-memory/. Committed to git — whole team benefits.</div></div>
-    <div class="card" data-accent="violet"><div class="card-title violet">Local Agent Memory</div><div class="card-desc">Personal memory in .claude/agent-memory-local/. Gitignored for your own notes.</div></div>
+    <div class="card"><div class="card-title accent">Auto-Memory</div><div class="card-desc">Saves observations automatically — commands, patterns, architecture. Stored in ~/.claude/projects/ with MEMORY.md index. First 200 lines / 25 KB load each session.</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber">Auto-Dream</div><div class="card-desc">Background memory consolidation between sessions. Claude reviews transcripts, extracts insights, and updates memory files while you're away. Enable with <code>autoDreamEnabled</code>.</div></div>
   </div>
-  <div class="callout anim">Memory types: user, feedback, project, reference. Enable <code>autoDreamEnabled</code> in settings for background consolidation.</div>
+  <div class="callout anim">Memory types: user, feedback, project, reference. Auto-memory is for the main agent — subagent memory is configured separately.</div>
+</div>
+
+<!-- ═══════ SLIDE 14b: Agent Memory ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Persistence</div>
+  <div class="slide-title anim">Agent Memory — Opt-In Per Subagent</div>
+  <div class="slide-subtitle anim">Subagents can persist their own knowledge across invocations. Enable with the <code>memory</code> frontmatter field — the agent reads MEMORY.md at startup and writes observations automatically.</div>
+  <div class="card-grid cols-2 anim">
+    <div class="code-block">
+      <div class="code-block-header">.claude/agents/researcher.md</div>
+      <div class="code-block-body"><span class="cb-punct">---</span>
+<span class="cb-key">name</span>: researcher
+<span class="cb-key">description</span>: Deep-dives into docs and APIs
+<span class="cb-key">model</span>: sonnet
+<span class="cb-key">memory</span>: <span class="cb-val">project</span>
+<span class="cb-key">tools</span>:
+  - Read
+  - Glob
+  - Grep
+  - WebFetch
+<span class="cb-punct">---</span>
+
+Research the topic thoroughly.
+Track findings in your memory.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.7rem">
+      <div class="card" data-accent="green"><div class="card-title green">project</div><div class="card-desc"><code>.claude/agent-memory/&lt;name&gt;/</code> — committed to git. Whole team benefits from accumulated knowledge.</div></div>
+      <div class="card" data-accent="violet"><div class="card-title violet">local</div><div class="card-desc"><code>.claude/agent-memory-local/&lt;name&gt;/</code> — gitignored. Personal notes only you can see.</div></div>
+      <div class="card" data-accent="sky"><div class="card-title sky">user</div><div class="card-desc"><code>~/.claude/agent-memory/&lt;name&gt;/</code> — global across all projects on your machine.</div></div>
+    </div>
+  </div>
+  <div class="callout anim">Read, Write, and Edit tools are auto-enabled for agents with memory. The agent decides what's worth remembering.</div>
 </div>
 
 <!-- ═══════ SLIDE 15: Lifecycle ═══════ -->
