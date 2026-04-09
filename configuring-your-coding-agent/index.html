@@ -91,8 +91,8 @@ body::after {
   inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 5vh 6vw;
+  justify-content: flex-start;
+  padding: 8vh 6vw;
   opacity: 0;
   transform: translateY(6px);
   pointer-events: none;
@@ -182,7 +182,7 @@ body::after {
 
 /* ── Typography ── */
 .section-label {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -192,7 +192,7 @@ body::after {
 .section-label::before { content: '// '; color: var(--dim); }
 .slide-title {
   font-family: var(--font-h);
-  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 1rem;
@@ -200,7 +200,7 @@ body::after {
   text-shadow: 0 0 10px rgba(79,195,247,0.4), 0 0 30px rgba(79,195,247,0.15);
 }
 .slide-subtitle {
-  font-size: clamp(0.78rem, 1.1vw, 0.9rem);
+  font-size: clamp(0.9rem, 1.3vw, 1.05rem);
   color: var(--text);
   line-height: 1.7;
   max-width: 60em;
@@ -250,7 +250,7 @@ body::after {
 .card-title {
   font-family: var(--font-h);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 1rem;
   margin-bottom: 0.3rem;
 }
 .card-title.accent { color: var(--accent); }
@@ -261,7 +261,7 @@ body::after {
 .card-title.sky { color: var(--accent2); }
 
 .card-desc {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--text);
   line-height: 1.55;
   opacity: 0.7;
@@ -292,7 +292,7 @@ body::after {
 .stat-card:nth-child(2) .stat-num { color: var(--green); text-shadow: 0 0 12px rgba(77,208,225,0.5); }
 .stat-card:nth-child(3) .stat-num { color: var(--accent3); text-shadow: 0 0 12px rgba(129,212,250,0.5); }
 .stat-label {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--text);
   opacity: 0.6;
   margin-top: 0.3rem;
@@ -304,7 +304,7 @@ body::after {
   border: 1px solid var(--border);
   padding: 1rem 1.2rem;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   line-height: 1.8;
   color: var(--text);
 }
@@ -312,7 +312,7 @@ body::after {
   color: var(--accent);
   font-weight: 700;
   margin-bottom: 0.3rem;
-  font-size: 0.85rem;
+  font-size: 1rem;
   text-shadow: 0 0 8px rgba(79,195,247,0.4);
 }
 .code-tree .tree-header::before { content: '> '; color: var(--muted); }
@@ -323,7 +323,7 @@ body::after {
 .comparison-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-family: var(--font-mono);
 }
 .comparison-table th {
@@ -379,11 +379,11 @@ body::after {
 .flow-title {
   font-family: var(--font-h);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 1rem;
   margin: 0.3rem 0 0.4rem;
   color: var(--text);
 }
-.flow-desc { font-size: 0.72rem; color: var(--text); opacity: 0.6; line-height: 1.5; }
+.flow-desc { font-size: 0.85rem; color: var(--text); opacity: 0.6; line-height: 1.5; }
 
 /* ── Hook timeline ── */
 .hook-flow {
@@ -403,7 +403,7 @@ body::after {
 .hook-card:nth-child(4) { border-top-color: var(--accent3); }
 .hook-name {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--accent);
   text-shadow: 0 0 6px rgba(79,195,247,0.3);
@@ -411,7 +411,7 @@ body::after {
 .hook-card:nth-child(2) .hook-name { color: var(--amber); }
 .hook-card:nth-child(3) .hook-name { color: var(--green); }
 .hook-card:nth-child(4) .hook-name { color: var(--accent3); }
-.hook-desc { font-size: 0.72rem; color: var(--text); opacity: 0.6; margin-top: 0.3rem; }
+.hook-desc { font-size: 0.85rem; color: var(--text); opacity: 0.6; margin-top: 0.3rem; }
 
 /* ── Tip box ── */
 .tip-box {
@@ -419,7 +419,7 @@ body::after {
   border: 1px solid var(--accent);
   box-shadow: 0 0 8px rgba(79,195,247,0.15);
   padding: 0.7rem 1rem;
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   color: var(--text);
   line-height: 1.5;
   display: flex;
@@ -430,7 +430,7 @@ body::after {
 .tip-icon { font-size: 1.1rem; flex-shrink: 0; }
 
 .callout {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: var(--accent);
   font-style: normal;
   margin-top: 0.8rem;
@@ -542,26 +542,12 @@ body::after {
 .perm-ex { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
 
 /* ── Closing slide ── */
-.closing-slide {
-  position: relative;
-  justify-content: flex-start;
-  padding-top: 8vh;
-}
-.closing-slide::after {
-  content: '';
-  position: absolute;
-  right: 0; top: 0;
-  width: 30%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(79,195,247,0.03), rgba(79,195,247,0.08));
-  border-left: 1px solid var(--border);
-}
 .resource-list {
   list-style: none;
   margin-top: 0.8rem;
 }
 .resource-list li {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: var(--text);
   opacity: 0.7;
   padding: 0.35rem 0;
@@ -831,11 +817,6 @@ body.notes-open .kb-hint {
 }
 body.notes-open .progress { z-index: 200; }
 
-/* ── Closing slide adjustments when notes open ── */
-.deck.notes-pushed .closing-slide { padding-top: 3vh; }
-.deck.notes-pushed .closing-slide .mega-title { font-size: clamp(1.4rem, 3vw, 2.2rem) !important; margin-bottom: 0.6rem !important; }
-.deck.notes-pushed .closing-slide .resource-list li { padding: 0.15rem 0 0.15rem 1.5rem; font-size: 0.72rem; }
-.deck.notes-pushed .closing-slide [style*="margin-top:2rem"] { margin-top: 0.8rem !important; padding-top: 0.6rem !important; font-size: 0.85rem !important; }
 </style>
 </head>
 <body>
@@ -1391,9 +1372,9 @@ body.notes-open .progress { z-index: 200; }
 </div>
 
 <!-- ═══════ SLIDE 19: Closing ═══════ -->
-<div class="slide closing-slide">
+<div class="slide">
   <div class="section-label anim">Resources</div>
-  <div class="mega-title anim" style="font-family:var(--font-h);font-size:clamp(2.5rem,4.5vw,3.8rem);font-weight:900;line-height:1.1;margin-bottom:1.5rem">Start Building<br>With Your Agent</div>
+  <div class="slide-title anim">Start Building With Your Agent</div>
   <ul class="resource-list anim">
     <li><strong>code.claude.com/docs</strong> — Claude Code official documentation</li>
     <li><strong>opencode.ai/docs</strong> — OpenCode official documentation</li>
@@ -1401,9 +1382,7 @@ body.notes-open .progress { z-index: 200; }
     <li><strong>Agent Skills spec</strong> — Open standard for portable skills</li>
     <li><strong>Your team's #agentic-engineering channel</strong></li>
   </ul>
-  <div class="anim" style="margin-top:2rem;border-top:2px solid var(--accent);padding-top:1rem;font-size:1rem">
-    Questions? Let's configure your first agent together.
-  </div>
+  <div class="callout anim">Questions? Let's configure your first agent together.</div>
 </div>
 
 </div><!-- end .deck -->
@@ -1423,8 +1402,19 @@ function show(idx) {
   const pct = ((idx + 1) / slides.length) * 100;
   progress.style.width = pct + '%';
   counter.textContent = (idx + 1) + ' / ' + slides.length;
+  history.replaceState(null, '', '#' + (idx + 1));
   syncNotes(idx);
 }
+
+function slideFromHash() {
+  const n = parseInt(location.hash.slice(1), 10);
+  return (n >= 1 && n <= slides.length) ? n - 1 : 0;
+}
+
+window.addEventListener('hashchange', () => {
+  current = slideFromHash();
+  show(current);
+});
 
 // ── Notes panel ──
 const notesPanel = document.getElementById('notesPanel');
@@ -1475,7 +1465,8 @@ document.addEventListener('touchend', e => {
   if (dx > 50) prev();
 });
 
-show(0);
+current = slideFromHash();
+show(current);
 
 // ── Inline Lucide-compatible SVG icons (no CDN needed) ──
 const ICONS = {
