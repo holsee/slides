@@ -654,12 +654,26 @@ code {
 }
 
 @media (max-width: 900px) {
-  .slide { padding: 4vh 4vw; }
+  html, body { overflow: auto; }
+  .deck { height: auto; min-height: 100vh; }
+  .slide {
+    position: relative;
+    inset: auto;
+    display: none;
+    flex-direction: column;
+    padding: 4vh 4vw 8vh;
+    overflow-y: auto;
+    opacity: 1;
+    transform: none;
+  }
+  .slide.active { display: flex; }
   .card-grid.cols-2, .card-grid.cols-3, .card-grid.cols-4, .card-grid.cols-5 {
     grid-template-columns: 1fr;
   }
-  .stat-grid, .hook-flow, .flow-grid { grid-template-columns: 1fr 1fr; }
+  .stat-grid, .hook-flow { grid-template-columns: 1fr 1fr; }
+  .flow-grid { grid-template-columns: 1fr 1fr; }
   .comparison-table { font-size: 0.65rem; }
+  .nav-arrows { z-index: 200; }
 }
 /* ═══════════════════════════════════════════
    SPEAKER NOTES PANEL — Orange Terminal Theme
