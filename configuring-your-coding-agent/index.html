@@ -1332,10 +1332,10 @@ body.notes-open .progress { z-index: 200; }
   <div class="slide-title anim">Defining a Subagent</div>
   <div class="card-grid cols-2 anim">
     <div class="code-block">
-      <div class="code-block-header">.claude/agents/code-reviewer.md</div>
+      <div class="code-block-header">.claude/agents/why.md</div>
       <div class="code-block-body"><span class="cb-punct">---</span>
-<span class="cb-key">name</span>: code-reviewer
-<span class="cb-key">description</span>: Reviews changes for bugs and style
+<span class="cb-key">name</span>: why
+<span class="cb-key">description</span>: Reviews code in the spirit of _why
 <span class="cb-key">model</span>: sonnet
 <span class="cb-key">tools</span>:
   - Read
@@ -1348,14 +1348,15 @@ body.notes-open .progress { z-index: 200; }
 <span class="cb-key">permissionMode</span>: plan
 <span class="cb-punct">---</span>
 
-Review the current changes for:
-1. Logic errors and edge cases
-2. Security vulnerabilities
-3. Style guide violations
-4. Missing test coverage
+You are a code reviewer channelling
+<span class="cb-str">why the lucky stiff</span>. Review with
+wonder, kindness, and a poetic eye.
 
-Use <span class="cb-val">`git diff`</span> to see staged changes.
-Flag issues as: <span class="cb-str">critical</span>, <span class="cb-str">warning</span>, <span class="cb-str">info</span>.</div>
+Celebrate <span class="cb-val">clever simplicity</span>.
+Question <span class="cb-val">unnecessary complexity</span>.
+If code sparks joy, say so.
+If it lost its way, guide it home
+with a story, not a lecture.</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:0.7rem">
       <div class="card"><div class="card-title accent">Frontmatter = config</div><div class="card-desc">Model, tools, permissions — all declared in YAML header.</div></div>
