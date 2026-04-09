@@ -126,19 +126,28 @@ body::after {
 }
 
 /* ── Author handle ── */
-.author-handle {
+.author-links {
   position: fixed;
   top: 2vh; right: 3vw;
-  font-size: 0.75rem;
-  color: var(--muted);
-  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
   z-index: 100;
+}
+.author-links a {
+  color: var(--text);
   text-decoration: none;
   transition: color 0.2s, text-shadow 0.2s;
+  display: flex;
+  align-items: center;
 }
-.author-handle:hover {
+.author-links a:hover {
   color: var(--accent);
   text-shadow: var(--glow-text);
+}
+.author-links a svg {
+  width: 1.3rem;
+  height: 1.3rem;
 }
 
 /* ── Slide counter ── */
@@ -547,6 +556,33 @@ body::after {
 .perm-desc { font-size: 0.78rem; color: var(--text); flex: 1; opacity: 0.8; }
 .perm-ex { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
 
+/* ── Code block (config/file viewer) ── */
+.code-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+.code-block-header {
+  font-size: 0.72rem;
+  color: var(--muted);
+  padding: 0.4rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--dim);
+}
+.code-block-body {
+  padding: 0.8rem 1rem;
+  color: var(--text);
+  white-space: pre;
+}
+.cb-key { color: var(--accent); }
+.cb-val { color: var(--green); }
+.cb-str { color: var(--amber); }
+.cb-comment { color: var(--muted); font-style: italic; }
+.cb-punct { color: var(--dim); }
+
 /* ── Closing slide ── */
 .resource-list {
   list-style: none;
@@ -855,7 +891,10 @@ body.notes-open .progress { z-index: 200; }
 </head>
 <body>
 
-<a class="author-handle" href="https://x.com/holsee" target="_blank" rel="noopener">@holsee</a>
+<div class="author-links">
+  <a href="https://github.com/holsee" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+  <a href="https://x.com/holsee" target="_blank" rel="noopener" aria-label="X (Twitter)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+</div>
 <div class="progress" id="progress"></div>
 <div class="counter" id="counter"></div>
 <div class="nav-arrows">
@@ -867,7 +906,7 @@ body.notes-open .progress { z-index: 200; }
 <div class="notes-panel" id="notesPanel" role="complementary" aria-label="Speaker notes">
   <div class="notes-header">
     <span class="notes-header-title">// Speaker Notes</span>
-    <span class="notes-header-slide" id="notesSlideLabel">Slide 1 of 19</span>
+    <span class="notes-header-slide" id="notesSlideLabel">Slide 1 of 22</span>
   </div>
   <div class="notes-content">
 
@@ -924,8 +963,16 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">The settings cascade matters for larger teams. Managed settings, which your platform team or admins control, override everything. Then project settings. Then personal user settings. This means you can enforce organisation-wide rules while still letting individual teams and developers customise their experience.</div>
     </div>
 
-    <!-- Slide 7: Rules -->
+    <!-- Slide 6b: Permissions in Practice -->
     <div class="note-section" data-slide="6">
+      <div class="note-heading">Permissions in Practice</div>
+      <div class="note-point">Here's what a real settings.json looks like. The allow array lists tools and commands the agent can use freely — no confirmation prompt. The ask array requires your approval every time. The deny array blocks access completely.</div>
+      <div class="note-point">Notice the prefix wildcard syntax. <span class="note-emphasis">Bash(git:*)</span> matches any git command — git status, git commit, git diff. You don't need to list every variation. <span class="note-emphasis">Read(.env*)</span> blocks any file starting with .env.</div>
+      <div class="note-point">Three settings files cascade. Managed settings from your admin override everything. Project settings in .claude/settings.json are committed to git — shared by the team. And settings.local.json is gitignored for personal preferences. This lets you enforce team policy while still giving individual developers flexibility.</div>
+    </div>
+
+    <!-- Slide 7: Rules -->
+    <div class="note-section" data-slide="7">
       <div class="note-heading">Splitting Instructions Into Modules</div>
       <div class="note-point">As your team grows and your instructions get longer, you'll want to split them into separate files. That's what the rules directory is for. Each markdown file in dot-claude-slash-rules covers one topic — code style, testing, API conventions, database queries.</div>
       <div class="note-point">The powerful feature here is path scoping. You can attach glob patterns to a rule so it only loads when the agent is working on matching files. Your React component rules only load when the agent touches files in your frontend directory. Your database query rules only load for backend files. This saves context tokens and reduces noise — the agent isn't distracted by irrelevant instructions.</div>
@@ -934,7 +981,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 8: Skills -->
-    <div class="note-section" data-slide="7">
+    <div class="note-section" data-slide="8">
       <div class="note-heading">Reusable Workflows</div>
       <div class="note-point">Skills are the most flexible extension point in both tools. A skill is a directory with a SKILL.md file that contains YAML frontmatter — a name, a description — and then markdown instructions. The name becomes a slash command. So a skill named deploy becomes slash-deploy.</div>
       <div class="note-point">There are four ways a skill gets invoked. You can call it directly as a slash command. The agent can auto-load it when it reads the description and decides it matches your prompt. You can pre-load it into a subagent's context at startup. Or the agent can programmatically call the Skill tool mid-conversation.</div>
@@ -943,7 +990,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 9: Agents & Subagents -->
-    <div class="note-section" data-slide="8">
+    <div class="note-section" data-slide="9">
       <div class="note-heading">Your Agent Team</div>
       <div class="note-point">Subagents are where things get really interesting. Each one runs in its own isolated context window with its own tools, its own model, and its own permissions. When it finishes, it sends a summary back to your main conversation. Your main context stays clean.</div>
       <div class="note-point">Let me walk through the six examples we've defined here. The <span class="note-emphasis">Code Reviewer</span> is read-only — no write tools at all. It scans diffs for bugs, style issues, and security concerns. Simple, focused, and safe.</div>
@@ -954,8 +1001,17 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">And the <span class="note-emphasis">Researcher</span> deep-dives into documentation, external APIs, and codebases to surface prior art and options. Read-only, web-search enabled, cannot touch your code.</div>
     </div>
 
+    <!-- Slide 9b: Defining a Subagent -->
+    <div class="note-section" data-slide="10">
+      <div class="note-heading">Anatomy of a Subagent Definition</div>
+      <div class="note-point">This is a real agent file. The frontmatter at the top is your configuration — model, tools, permissions. The markdown body below becomes the agent's system prompt. That's it. One file, two sections.</div>
+      <div class="note-point">Notice this code reviewer has <span class="note-emphasis">Read, Glob, Grep, and git diff</span> — but Edit and Write are explicitly disallowed. It can look at everything, change nothing. The permissionMode is set to plan, which means it operates in read-only mode. This is defence in depth.</div>
+      <div class="note-point">The body is where you put the agent's personality and instructions. What should it look for? How should it report findings? What severity levels should it use? This is the system prompt that makes one subagent different from another.</div>
+      <div class="note-point">You invoke subagents either explicitly — specifying the subagent_type in an Agent tool call — or let the main agent delegate automatically based on the task. Both work. Explicit is better when you want guaranteed routing.</div>
+    </div>
+
     <!-- Slide 10: Hooks -->
-    <div class="note-section" data-slide="9">
+    <div class="note-section" data-slide="11">
       <div class="note-heading">Deterministic Automation</div>
       <div class="note-point">Everything we've talked about so far — instructions, skills, agents — relies on the LLM choosing to follow them. And most of the time it does. But for things that absolutely must happen, every single time, you want hooks.</div>
       <div class="note-point">Hooks fire at specific lifecycle points. Session start. Before a tool executes. After a tool completes. When the agent finishes its turn. They're deterministic — they always fire. The agent doesn't choose whether to run them.</div>
@@ -964,8 +1020,17 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">Claude Code gives you four handler types: shell commands, HTTP endpoints, LLM prompt evaluation, and full agent-based hooks. OpenCode uses a JavaScript plugin system that subscribes to the same lifecycle events. Different implementation, same concept.</div>
     </div>
 
+    <!-- Slide 10b: Hooks in Practice -->
+    <div class="note-section" data-slide="12">
+      <div class="note-heading">Real Hook Configurations</div>
+      <div class="note-point">Two practical examples here. The first is an auto-formatter. Every time the agent writes or edits a file, prettier runs automatically. This is deterministic — it always happens, it doesn't depend on the LLM remembering to format. This is the single most popular hook I see teams adopt first.</div>
+      <div class="note-point">The second is a safety gate. Before any bash command executes, a prompt hook asks a fast LLM: "is this command safe?" If the LLM says no, the command is blocked. This catches things like accidental rm -rf or commands that would modify production resources.</div>
+      <div class="note-point">The matcher syntax is pipe-separated tool names. <span class="note-emphasis">Write|Edit</span> fires on either tool. You can also use the <span class="note-emphasis">if</span> field for finer matching — like only matching bash commands that start with git.</div>
+      <div class="note-point">Four hook types: command runs a shell script, prompt asks an LLM, agent spawns a full subagent with tools, and http POSTs to a URL. Most teams start with command hooks and graduate to prompt hooks for safety gates.</div>
+    </div>
+
     <!-- Slide 11: Commands -->
-    <div class="note-section" data-slide="10">
+    <div class="note-section" data-slide="13">
       <div class="note-heading">Team Shortcuts</div>
       <div class="note-point">Custom commands are the simplest extension. Drop a markdown file in your commands directory, and it becomes a slash command. The filename is the command name. review.md becomes slash-project-review.</div>
       <div class="note-point">The real power is standardisation. Instead of every engineer writing their own review prompt, you define it once. Slash-review runs git diff against main, injects the actual diff into the prompt, and gives the agent specific criteria to evaluate — bugs, security issues, missing test coverage, performance concerns. Everyone on the team gets the same quality bar.</div>
@@ -974,7 +1039,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 12: MCP, Tools, Plugins -->
-    <div class="note-section" data-slide="11">
+    <div class="note-section" data-slide="14">
       <div class="note-heading">Connecting to the Outside World</div>
       <div class="note-point">So far everything we've covered is about the agent interacting with your codebase. MCP servers extend the agent's reach to external systems — your database, Slack, GitHub, Jira, internal APIs. The agent can query your database, post to Slack, create GitHub issues — whatever tools the MCP server exposes.</div>
       <div class="note-point">MCP supports local servers, which run as child processes on your machine, and remote servers over HTTP with optional OAuth. Both tools support MCP but configure it slightly differently — Claude Code uses a dot-mcp.json file, OpenCode puts it in the main config.</div>
@@ -984,7 +1049,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 13: Modes & Output Styles -->
-    <div class="note-section" data-slide="12">
+    <div class="note-section" data-slide="15">
       <div class="note-heading">Controlling Agent Behaviour</div>
       <div class="note-point">Modes and output styles control how the agent behaves without changing your permanent configuration. Think of them as runtime switches.</div>
       <div class="note-point">Both tools ship with Build mode, which has full tool access, and Plan mode, which is read-only — the agent can analyse and suggest but cannot modify files. OpenCode adds Review and Debug modes out of the box, and you can define custom modes as markdown files.</div>
@@ -993,7 +1058,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 14: Memory -->
-    <div class="note-section" data-slide="13">
+    <div class="note-section" data-slide="16">
       <div class="note-heading">Learning Across Sessions</div>
       <div class="note-point">Here's something that trips people up. Every session starts with a completely fresh context window. The agent has no memory of what you did yesterday. Memory is the feature that bridges that gap.</div>
       <div class="note-point">Claude Code has auto-memory built in. As the agent works, it automatically saves observations — commands it discovers work, patterns it notices, architectural insights it picks up. These accumulate in a MEMORY.md index file, and the first two hundred lines load at the start of every session.</div>
@@ -1003,7 +1068,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 15: Lifecycle -->
-    <div class="note-section" data-slide="14">
+    <div class="note-section" data-slide="17">
       <div class="note-heading">The Five-Stage Journey</div>
       <div class="note-point">Let me give you the full adoption lifecycle in five stages. Stage one is Bootstrap. Run slash-init. It takes two minutes. It generates your first CLAUDE.md or AGENTS.md from your actual codebase. Commit it immediately. You're already ahead of most teams.</div>
       <div class="note-point">Stage two is Configure. This is your first week. Set permissions. Deny access to sensitive files. Add rules for your code style and testing conventions. Define your first skill — PR review is the obvious starting point.</div>
@@ -1014,7 +1079,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 16: Comparison -->
-    <div class="note-section" data-slide="15">
+    <div class="note-section" data-slide="18">
       <div class="note-heading">Choosing Your Tool</div>
       <div class="note-point">I won't read every row of this table — it's here as a reference you can come back to. But let me highlight the key differences.</div>
       <div class="note-point">Claude Code has built-in rules with path scoping, built-in auto-memory, and a richer hook system with four different handler types — shell commands, HTTP, LLM prompts, and agent-based hooks. It's deeply integrated with Anthropic's models.</div>
@@ -1023,8 +1088,8 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">My recommendation: if your organisation is standardised on Anthropic models, Claude Code offers the tightest integration. If you need multi-provider flexibility or want to use open-source models, OpenCode gives you that freedom. Either way, the configuration concepts are transferable.</div>
     </div>
 
-    <!-- Slide 17: Best Practices -->
-    <div class="note-section" data-slide="16">
+    <!-- Slide 20: Best Practices -->
+    <div class="note-section" data-slide="19">
       <div class="note-heading">What the Best Teams Do</div>
       <div class="note-point">Six practices that separate teams who get real value from teams who are still fighting with their agent.</div>
       <div class="note-point">First, <span class="note-emphasis">commit your config to git</span>. This is the single highest-leverage thing you can do. When one engineer figures out the right test command, discovers a gotcha, or writes a skill that saves time — the entire team benefits on their next git pull.</div>
@@ -1036,7 +1101,7 @@ body.notes-open .progress { z-index: 200; }
     </div>
 
     <!-- Slide 18: Getting Started -->
-    <div class="note-section" data-slide="17">
+    <div class="note-section" data-slide="20">
       <div class="note-heading">Your Action Plan for This Week</div>
       <div class="note-point">I want to make this very concrete. Five steps, each one under fifteen minutes. You can do all of these by end of day Friday.</div>
       <div class="note-point"><span class="note-emphasis">Step one</span>: open a terminal in your project directory and run slash-init. It takes two minutes. Review the generated file, make any obvious corrections, and commit it. That's it. You're configured.</div>
@@ -1047,8 +1112,8 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">I'm happy to pair with anyone who wants help getting their first configuration set up. Hands-on pairing is the fastest way to build confidence with these tools.</div>
     </div>
 
-    <!-- Slide 19: Closing -->
-    <div class="note-section" data-slide="18">
+    <!-- Slide 22: Closing -->
+    <div class="note-section" data-slide="21">
       <div class="note-heading">Closing</div>
       <div class="note-point">Here are the links to the official documentation for both tools. Bookmark them. Both have excellent docs with interactive explorers and real examples.</div>
       <div class="note-point">If you have questions after today, drop them in our agentic-engineering channel. Share your configurations there too — when someone writes a good skill or discovers a useful hook, the whole team should know about it.</div>
@@ -1160,6 +1225,39 @@ body.notes-open .progress { z-index: 200; }
   <div class="callout anim">Settings cascade: Managed (highest) → Project → User (lowest). Deny at any level blocks the tool everywhere.</div>
 </div>
 
+<!-- ═══════ SLIDE 6b: Permissions Example ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Security</div>
+  <div class="slide-title anim">Permissions in Practice</div>
+  <div class="card-grid cols-2 anim">
+    <div class="code-block">
+      <div class="code-block-header">.claude/settings.json</div>
+      <div class="code-block-body">{
+  <span class="cb-key">"permissions"</span>: {
+    <span class="cb-key">"allow"</span>: [
+      <span class="cb-val">"Bash(npm run test:*)"</span>,
+      <span class="cb-val">"Bash(git:*)"</span>,
+      <span class="cb-val">"Read"</span>
+    ],
+    <span class="cb-key">"ask"</span>: [
+      <span class="cb-val">"Bash(npm publish:*)"</span>
+    ],
+    <span class="cb-key">"deny"</span>: [
+      <span class="cb-val">"Read(.env*)"</span>,
+      <span class="cb-val">"Read(secrets/)"</span>
+    ]
+  }
+}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.7rem">
+      <div class="card"><div class="card-title accent">Prefix wildcards</div><div class="card-desc"><code>Bash(git:*)</code> matches git status, git commit, etc.</div></div>
+      <div class="card" data-accent="green"><div class="card-title green">Tool-only rules</div><div class="card-desc"><code>Read</code> with no args allows all read operations.</div></div>
+      <div class="card" data-accent="amber"><div class="card-title amber">Three settings files</div><div class="card-desc">Managed (admin) → .claude/settings.json (team) → settings.local.json (personal)</div></div>
+      <div class="card" data-accent="rose"><div class="card-title rose">Deny always wins</div><div class="card-desc">Even in bypass mode, deny rules cannot be overridden.</div></div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════ SLIDE 7: Rules ═══════ -->
 <div class="slide">
   <div class="section-label anim">Instructions</div>
@@ -1228,6 +1326,46 @@ body.notes-open .progress { z-index: 200; }
   <div class="callout anim" style="font-style:normal;color:var(--muted);font-size:0.78rem"><code style="color:var(--muted)">Frontmatter: name, description, model, tools, permissionMode, hooks, skills, maxTurns, memory</code></div>
 </div>
 
+<!-- ═══════ SLIDE 9b: Defining a Subagent ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Delegation</div>
+  <div class="slide-title anim">Defining a Subagent</div>
+  <div class="card-grid cols-2 anim">
+    <div class="code-block">
+      <div class="code-block-header">.claude/agents/code-reviewer.md</div>
+      <div class="code-block-body"><span class="cb-punct">---</span>
+<span class="cb-key">name</span>: code-reviewer
+<span class="cb-key">description</span>: Reviews changes for bugs and style
+<span class="cb-key">model</span>: sonnet
+<span class="cb-key">tools</span>:
+  - Read
+  - Glob
+  - Grep
+  - Bash(git diff:*)
+<span class="cb-key">disallowedTools</span>:
+  - Edit
+  - Write
+<span class="cb-key">permissionMode</span>: plan
+<span class="cb-punct">---</span>
+
+Review the current changes for:
+1. Logic errors and edge cases
+2. Security vulnerabilities
+3. Style guide violations
+4. Missing test coverage
+
+Use <span class="cb-val">`git diff`</span> to see staged changes.
+Flag issues as: <span class="cb-str">critical</span>, <span class="cb-str">warning</span>, <span class="cb-str">info</span>.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.7rem">
+      <div class="card"><div class="card-title accent">Frontmatter = config</div><div class="card-desc">Model, tools, permissions — all declared in YAML header.</div></div>
+      <div class="card" data-accent="green"><div class="card-title green">Body = system prompt</div><div class="card-desc">Markdown below the frontmatter becomes the agent's instructions.</div></div>
+      <div class="card" data-accent="amber"><div class="card-title amber">Tool restrictions</div><div class="card-desc"><code>tools</code> whitelists, <code>disallowedTools</code> blacklists. Both are optional.</div></div>
+      <div class="card" data-accent="violet"><div class="card-title violet">Invocation</div><div class="card-desc">Use the Agent tool with <code>subagent_type</code> or let the main agent delegate automatically.</div></div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════ SLIDE 10: Hooks ═══════ -->
 <div class="slide">
   <div class="section-label anim">Automation</div>
@@ -1244,6 +1382,41 @@ body.notes-open .progress { z-index: 200; }
     <div class="card" data-accent="amber"><div class="card-title amber">HTTP</div><div class="card-desc">POST to a URL — same JSON format, response as body</div></div>
     <div class="card" data-accent="violet"><div class="card-title violet">Prompt / Agent</div><div class="card-desc">LLM evaluates a condition, returns yes/no decision</div></div>
     <div class="card" data-accent="green"><div class="card-title green">Plugin Events</div><div class="card-desc">JS/TS module subscribes to tool.execute.before/after events (OpenCode)</div></div>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE 10b: Hook Examples ═══════ -->
+<div class="slide">
+  <div class="section-label anim">Automation</div>
+  <div class="slide-title anim">Hooks in Practice</div>
+  <div class="card-grid cols-2 anim">
+    <div class="code-block">
+      <div class="code-block-header">.claude/settings.json → hooks</div>
+      <div class="code-block-body">{
+  <span class="cb-key">"hooks"</span>: {
+    <span class="cb-key">"PostToolUse"</span>: [{
+      <span class="cb-key">"matcher"</span>: <span class="cb-val">"Write|Edit"</span>,
+      <span class="cb-key">"hooks"</span>: [{
+        <span class="cb-key">"type"</span>: <span class="cb-val">"command"</span>,
+        <span class="cb-key">"command"</span>: <span class="cb-val">"prettier --write \"$FILE\""</span>
+      }]
+    }],
+    <span class="cb-key">"PreToolUse"</span>: [{
+      <span class="cb-key">"matcher"</span>: <span class="cb-val">"Bash"</span>,
+      <span class="cb-key">"hooks"</span>: [{
+        <span class="cb-key">"type"</span>: <span class="cb-val">"prompt"</span>,
+        <span class="cb-key">"prompt"</span>: <span class="cb-val">"Is this safe? $ARGS"</span>
+      }]
+    }]
+  }
+}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.7rem">
+      <div class="card"><div class="card-title accent">Auto-format on save</div><div class="card-desc">PostToolUse on Write|Edit runs prettier after every file change. Deterministic, not LLM-dependent.</div></div>
+      <div class="card" data-accent="amber"><div class="card-title amber">Safety gate</div><div class="card-desc">PreToolUse prompt hook asks an LLM to evaluate bash commands before execution.</div></div>
+      <div class="card" data-accent="green"><div class="card-title green">Matcher syntax</div><div class="card-desc">Pipe-separated tool names. <code>Write|Edit</code> fires on either tool.</div></div>
+      <div class="card" data-accent="violet"><div class="card-title violet">Hook types</div><div class="card-desc"><code>command</code> runs shell, <code>prompt</code> asks LLM, <code>agent</code> spawns a subagent, <code>http</code> calls a URL.</div></div>
+    </div>
   </div>
 </div>
 
