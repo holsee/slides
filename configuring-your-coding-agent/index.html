@@ -1562,12 +1562,13 @@ with a story, not a lecture.</div>
   <div class="section-label anim">Persistence</div>
   <div class="slide-title anim">Memory — Persistent Learning Across Sessions</div>
   <div class="slide-subtitle anim">Each session starts fresh. Memory bridges the gap — accumulating project knowledge over time.</div>
-  <div class="card-grid cols-3 anim">
+  <div class="card-grid cols-2 anim">
     <div class="card"><div class="card-title accent">Auto-Memory</div><div class="card-desc">Saves observations automatically — commands, patterns, architecture. Stored in ~/.claude/projects/ with MEMORY.md index.</div></div>
+    <div class="card" data-accent="amber"><div class="card-title amber">Auto-Dream</div><div class="card-desc">Background memory consolidation between sessions. Claude reviews transcripts, extracts insights, and updates memory files while you're away.</div></div>
     <div class="card" data-accent="green"><div class="card-title green">Shared Agent Memory</div><div class="card-desc">Subagents persist in .claude/agent-memory/. Committed to git — whole team benefits.</div></div>
     <div class="card" data-accent="violet"><div class="card-title violet">Local Agent Memory</div><div class="card-desc">Personal memory in .claude/agent-memory-local/. Gitignored for your own notes.</div></div>
   </div>
-  <div class="callout anim">Memory types: user, feedback, project, reference. First 200 lines / 25 KB load each session.</div>
+  <div class="callout anim">Memory types: user, feedback, project, reference. Enable <code>autoDreamEnabled</code> in settings for background consolidation.</div>
 </div>
 
 <!-- ═══════ SLIDE 15: Lifecycle ═══════ -->
