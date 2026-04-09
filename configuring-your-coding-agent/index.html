@@ -594,6 +594,17 @@ body::after {
   font-size: 0.6rem;
   color: var(--muted);
 }
+.kb-hint kbd.clickable {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.kb-hint kbd.clickable:hover {
+  background: #f0a030;
+  color: var(--bg);
+  border-color: #f0a030;
+  box-shadow: 0 0 8px rgba(240,160,48,0.4);
+  text-shadow: none;
+}
 .kb-hint kbd.kb-orange {
   border-color: #7c4a00;
   color: #f0a030;
@@ -814,6 +825,7 @@ body.notes-open .counter,
 body.notes-open .nav-arrows,
 body.notes-open .kb-hint {
   bottom: calc(42vh + 1vh);
+  z-index: 200;
 }
 body.notes-open .progress { z-index: 200; }
 
@@ -828,7 +840,7 @@ body.notes-open .progress { z-index: 200; }
   <button onclick="prev()" aria-label="Previous">←</button>
   <button onclick="next()" aria-label="Next">→</button>
 </div>
-<div class="kb-hint"><kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> · <kbd class="kb-orange">N</kbd> notes</div>
+<div class="kb-hint"><kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> · <kbd class="kb-orange clickable" onclick="toggleNotes()">N</kbd> notes</div>
 
 <div class="notes-panel" id="notesPanel" role="complementary" aria-label="Speaker notes">
   <div class="notes-header">
@@ -1420,12 +1432,13 @@ window.addEventListener('hashchange', () => {
 const notesPanel = document.getElementById('notesPanel');
 const notesSlideLabel = document.getElementById('notesSlideLabel');
 const noteSections = document.querySelectorAll('.note-section');
-let notesOpen = true;
+let notesOpen = window.innerWidth >= 900;
 
-// Show notes by default
-notesPanel.classList.add('open');
-document.body.classList.add('notes-open');
-document.getElementById('deck').classList.add('notes-pushed');
+if (notesOpen) {
+  notesPanel.classList.add('open');
+  document.body.classList.add('notes-open');
+  document.getElementById('deck').classList.add('notes-pushed');
+}
 
 function toggleNotes() {
   notesOpen = !notesOpen;
