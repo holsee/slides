@@ -1119,8 +1119,8 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">And plugins are the packaging layer that bundles everything — skills, hooks, agents, MCP servers — into a single distributable unit. Claude Code uses git-based marketplaces. OpenCode uses npm packages. Both support local development and testing.</div>
     </div>
 
-    <!-- Slide 13: Modes & Output Styles -->
-    <div class="note-section" data-slide="16">
+    <!-- Slide 15: Modes & Output Styles -->
+    <div class="note-section" data-slide="15">
       <div class="note-heading">Controlling Agent Behaviour</div>
       <div class="note-point">Modes and output styles control how the agent behaves without changing your permanent configuration. Think of them as runtime switches.</div>
       <div class="note-point">Both tools ship with Build mode, which has full tool access, and Plan mode, which is read-only — the agent can analyse and suggest but cannot modify files. OpenCode adds Review and Debug modes out of the box, and you can define custom modes as markdown files.</div>
@@ -1128,8 +1128,8 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">Claude Code has output styles, which change how the agent communicates rather than what it can do. The Learning style is worth knowing about — it inserts TODO-human markers in code for the developer to fill in, turning the agent into a teaching tool. Consider this for onboarding junior developers.</div>
     </div>
 
-    <!-- Slide 14: Memory -->
-    <div class="note-section" data-slide="17">
+    <!-- Slide 16: Memory -->
+    <div class="note-section" data-slide="16">
       <div class="note-heading">Learning Across Sessions</div>
       <div class="note-point">Here's something that trips people up. Every session starts with a completely fresh context window. The agent has no memory of what you did yesterday. Memory is the feature that bridges that gap.</div>
       <div class="note-point">Claude Code has auto-memory built in. As the agent works, it automatically saves observations — commands it discovers work, patterns it notices, architectural insights it picks up. These accumulate in a MEMORY.md index file, and the first two hundred lines load at the start of every session.</div>
@@ -1138,8 +1138,8 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">The practical takeaway: when you correct the agent about something, ask yourself whether that correction should be permanent. If you've corrected the same thing twice, it should go in your config — either as a rule, a CLAUDE.md update, or formalised from an auto-memory entry.</div>
     </div>
 
-    <!-- Slide 14b: Agent Memory -->
-    <div class="note-section" data-slide="15">
+    <!-- Slide 17: Agent Memory -->
+    <div class="note-section" data-slide="17">
       <div class="note-heading">Agent Memory — How It Works</div>
       <div class="note-point">This is the mechanism that makes subagents genuinely useful over time. You add one line to your agent's frontmatter — <span class="note-emphasis">memory: project</span>, or local, or user — and the agent gets persistent storage.</div>
       <div class="note-point">Here's what happens under the hood. When the agent starts, Claude Code loads the first 200 lines of its MEMORY.md file into context. Read, Write, and Edit tools are automatically enabled for the memory directory. The agent decides what's worth remembering — patterns it discovers, solutions to problems, architectural insights — and writes them to its memory files.</div>
@@ -1147,7 +1147,7 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">The key insight: you don't write the memories. The agent does. Your job is to choose the right scope and let the agent accumulate knowledge naturally. Over weeks and months, a subagent with project memory becomes increasingly valuable — it knows your codebase's quirks, your team's patterns, your common pitfalls.</div>
     </div>
 
-    <!-- Slide 15: Lifecycle -->
+    <!-- Slide 18: Lifecycle -->
     <div class="note-section" data-slide="18">
       <div class="note-heading">The Five-Stage Journey</div>
       <div class="note-point">Let me give you the full adoption lifecycle in five stages. Stage one is Bootstrap. Run slash-init. It takes two minutes. It generates your first CLAUDE.md or AGENTS.md from your actual codebase. Commit it immediately. You're already ahead of most teams.</div>
@@ -1158,7 +1158,7 @@ body.notes-open .progress { z-index: 200; }
       <div class="note-point">The key message here is that <span class="note-emphasis">this is not a one-time setup</span>. The best configurations I've seen evolve daily. Treat it like your CI pipeline — living infrastructure that gets better every week.</div>
     </div>
 
-    <!-- Slide 16: Comparison -->
+    <!-- Slide 19: Comparison -->
     <div class="note-section" data-slide="19">
       <div class="note-heading">Choosing Your Tool</div>
       <div class="note-point">I won't read every row of this table — it's here as a reference you can come back to. But let me highlight the key differences.</div>
